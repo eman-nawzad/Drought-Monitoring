@@ -9,7 +9,26 @@ This project provides an interactive web application for visualizing drought con
 - Automatic conversion of GeoTIFF to GeoJSON for mapping.
 - Intuitive interface for drought analysis and decision-making.
 
+## Repository Structure
 
+```
+drought-monitoring-app/
+├── app/
+│   ├── app.py                # Main Streamlit application script
+│   ├── utils.py              # Helper functions (e.g., for processing GeoTIFF to GeoJSON)
+│   ├── map_styles.py         # Optional: Custom styling for maps
+├── data/
+│   ├── processed_spi.geojson # Preprocessed GeoJSON file (optional for faster loading)
+│   ├── sample_spi.tif        # Sample SPI GeoTIFF file (for testing)
+├── assets/
+│   ├── logo.png              # App logo (if applicable)
+│   ├── styles.css            # Optional: Custom CSS for Streamlit
+├── requirements.txt          # List of Python dependencies
+├── README.md                 # Project documentation (this file)
+├── .gitignore                # Files/folders to ignore in GitHub
+├── LICENSE                   # Optional: License for your project
+└── SPI_12_Month_2023.tif     # Default SPI GeoTIFF file
+```
 
 ## Getting Started
 
@@ -72,4 +91,6 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 ---
 
 If you encounter any issues or have feature requests, feel free to open an issue on the GitHub repository.
+
+
 
