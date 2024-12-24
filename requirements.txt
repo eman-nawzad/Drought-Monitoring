@@ -1,7 +1,4 @@
 streamlit
-folium
 geopandas
 rasterio
-shapely
-streamlit-folium
-
+matplotlib
