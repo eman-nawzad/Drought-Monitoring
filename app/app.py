@@ -1,54 +1,49 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
 import geopandas as gpd
-from app.utils import convert_geotiff_to_geojson
+import rasterio
+import numpy as np
+import matplotlib.pyplot as plt
+from shapely.geometry import shape
+from io import BytesIO
 
-# App
- title and description
-st.title("Drought Monitoring Map")
-st.markdown("Explore and visualize drought conditions using SPI data.")
+# Load your SPI GeoTIFF data
+def load_spi_data():
+    # Use rasterio to load your SPI GeoTIFF
+    with rasterio.open('SPI_12_Month_2023.tif') as src:
+        data = src.read(1)  # Reading the first band (assuming it's single-band)
+        transform = src.transform
+    return data, transform
 
-# Sidebar: File upload and data source selection
-st.sidebar.header("Data Source")
-data_source = st.sidebar.radio(
-    "Select Data Source:",
-    ("Default SPI Data", "Upload Custom GeoTIFF")
-)
+# Function to display SPI data on a map
+def plot_spi_map():
+    data, transform = load_spi_data()
+    
+    # Create a simple map of SPI data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.imshow(data, cmap='viridis', origin='upper', extent=(transform[2], transform[2] + transform[0] * data.shape[1], transform[5] + transform[4] * data.shape[0], transform[5]))
+    ax.set_title("SPI 12 Month (2023) - Drought Index")
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
+    plt.colorbar(ax.imshow(data, cmap='viridis'), ax=ax, label="SPI Value")
 
-# Process default SPI file or uploaded file
-if data_source == "Default SPI Data":
-    st.sidebar.info("Using default SPI data: SPI_12_Month_2023.tif")
-    geojson_path = "data/processed_spi.geojson"
-else:
-    uploaded_file = st.sidebar.file_uploader("Upload SPI GeoTIFF file", type=["tif", "tiff"])
-    if uploaded_file:
-        st.sidebar.info("Processing uploaded file...")
-        geojson_path = convert_geotiff_to_geojson(uploaded_file)
-    else:
-        st.warning("Please upload a GeoTIFF file to proceed.")
-        st.stop()
+    st.pyplot(fig)
 
-# Load GeoJSON data
-def render_map(geojson_path):
-    gdf = gpd.read_file(geojson_path)
+# Function to display information and instructions
+def display_info():
+    st.title("Drought Monitoring Web Application")
+    st.write(
+        """
+        This application displays the SPI data for monitoring drought conditions. The SPI data is used to assess precipitation deficit and drought severity. 
+        The map above shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
+        """
+    )
 
-    m = folium.Map(location=[33.3, 44.4], zoom_start=6, tiles="cartodbpositron")
-    folium.GeoJson(
-        gdf,
-        name="SPI Data",
-        style_function=lambda feature: {
-            'fillColor': feature['properties'].get('color', '#FFEDA0'),
-            'color': 'black',
-            'weight': 0.5,
-            'fillOpacity': 0.6,
-        },
-    ).add_to(m)
+# Main application function
+def main():
+    display_info()
+    plot_spi_map()
 
-    folium.LayerControl().add_to(m)
-    return m
+if __name__ == "__main__":
+    main()
 
-st.markdown("### SPI Data Visualization")
-map_object = render_map(geojson_path)
-st_folium(map_object, width=700, height=500)
 
