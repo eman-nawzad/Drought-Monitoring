@@ -1,4 +1,4 @@
 streamlit
-geopandas
-rasterio
-matplotlib
+folium
+streamlit-folium
+
