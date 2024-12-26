@@ -39,3 +39,28 @@ def main():
 if __name__ == "__main__":
     main()
 
+import streamlit as st
+
+# Legend HTML and CSS
+legend_html = """
+<div style="
+    position: fixed; 
+    bottom: 10px; 
+    left: 10px; 
+    border:2px solid grey; 
+    z-index:9999; 
+    background-color:white; 
+    padding:10px; 
+    font-size:14px;">
+    <b>Legend:</b>
+    <ul style="list-style-type:none; padding-left: 0;">
+      <li><span style="background-color:#1f78b4; color:white; padding:2px 5px;">&nbsp;&nbsp;</span> SPI > 2 (Very Wet)</li>
+      <li><span style="background-color:#33a02c; color:white; padding:2px 5px;">&nbsp;&nbsp;</span> 1.5 < SPI <= 2 (Moderately Wet)</li>
+      <li><span style="background-color:#ff7f00; color:white; padding:2px 5px;">&nbsp;&nbsp;</span> -1.5 < SPI <= -1.5 (Moderately Dry)</li>
+      <li><span style="background-color:#e31a1c; color:white; padding:2px 5px;">&nbsp;&nbsp;</span> SPI <= -2 (Very Dry)</li>
+    </ul>
+</div>
+"""
+
+# Add the legend to the Streamlit app
+st.components.v1.html(legend_html, height=200)
