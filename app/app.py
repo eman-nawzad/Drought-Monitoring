@@ -1,46 +1,25 @@
 import streamlit as st
 import geopandas as gpd
-import folium
-from streamlit_folium import st_folium
+import matplotlib.pyplot as plt
 
 # Load your SPI GeoJSON data
 def load_spi_data():
-    # Use geopandas to load the SPI GeoJSON
+    # Use geopandas to load the SPI GeoJSON (file is in the same directory as app.py)
     gdf = gpd.read_file('SPI_12_GeoJSON.geojson')  # File is in the same directory as app.py
     return gdf
 
-# Function to create an interactive map with zoom functionality
-def create_interactive_map():
+# Function to display SPI data on a map
+def plot_spi_map():
     gdf = load_spi_data()
+    
+    # Create a simple map of SPI data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    gdf.plot(ax=ax, cmap='viridis', legend=True)
+    ax.set_title("SPI 12 Month (2023) - Drought Index")
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
 
-    # Get the bounds of the GeoDataFrame to center the map
-    bounds = gdf.total_bounds  # [minx, miny, maxx, maxy]
-    map_center = [(bounds[1] + bounds[3]) / 2, (bounds[0] + bounds[2]) / 2]
-
-    # Create a folium map
-    m = folium.Map(location=map_center, zoom_start=6)
-
-    # Add the GeoJSON data to the map
-    folium.GeoJson(
-        gdf,
-        name="SPI Data",
-        style_function=lambda feature: {
-            "fillColor": "#0073e6" if feature["properties"]["SPI"] < 0 else "#ffcc00",
-            "color": "black",
-            "weight": 0.5,
-            "fillOpacity": 0.7,
-        },
-        tooltip=folium.GeoJsonTooltip(
-            fields=["SPI"],  # Replace with the correct key
-            aliases=["SPI Value:"],
-            localize=True,
-        ),
-    ).add_to(m)
-
-    # Add layer control to enable toggling layers
-    folium.LayerControl().add_to(m)
-
-    return m
+    st.pyplot(fig)
 
 # Function to display information and instructions
 def display_info():
@@ -48,21 +27,42 @@ def display_info():
     st.write(
         """
         This application displays the SPI data for monitoring drought conditions. The SPI data is used to assess precipitation deficit and drought severity. 
-        The interactive map below allows you to zoom in and out to explore the SPI data in greater detail.
+        The map above shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
         """
     )
 
 # Main application function
 def main():
     display_info()
-
-    # Generate the interactive map
-    m = create_interactive_map()
-
-    # Display the map using Streamlit Folium
-    st_folium(m, width=800, height=500)
+    plot_spi_map()
 
 if __name__ == "__main__":
     main()
+
+
+
+elif page == "SPI Map":
+    st.markdown("<h2 class='header-font'>SPI Map</h2>", unsafe_allow_html=True)
+    st.markdown("<p class='text-font'>This page displays the Standardized Precipitation Index (SPI) data as an interactive map.</p>", unsafe_allow_html=True)
+
+    # Load SPI GeoJSON file
+    spi_geojson_path = "SPI_12_GeoJSON.geojson"
+
+    # Check if file exists
+    if not os.path.exists(spi_geojson_path):
+        st.error(f"The file {spi_geojson_path} does not exist. Please check the file path.")
+    else:
+        # Load the GeoJSON data
+        spi_gdf = gpd.read_file(spi_geojson_path)
+
+        # Display GeoJSON map
+        st.header("Interactive SPI Map")
+        spi_map_center = [spi_gdf.geometry.centroid.y.mean(), spi_gdf.geometry.centroid.x.mean()]
+        spi_map = folium.Map(location=spi_map_center, zoom_start=10)
+
+        # Add SPI GeoJSON layer to the map
+        folium.GeoJson(spi_geojson_path, name="SPI").add_to(spi_map)
+        st_folium(spi_map, width=700, height=500)
+
 
 
