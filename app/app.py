@@ -1,43 +1,40 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
+import geopandas as gpd
+import matplotlib.pyplot as plt
 
-# Define SPI categories and their colors
-spi_categories = [
-    {"name": "Very Wet", "range": "> 2", "color": "#1f78b4"},
-    {"name": "Moderately Wet", "range": "1.5 - 2", "color": "#33a02c"},
-    {"name": "Neutral", "range": "-1.5 - 1.5", "color": "#ffff99"},
-    {"name": "Moderately Dry", "range": "-2 - -1.5", "color": "#ff7f00"},
-    {"name": "Very Dry", "range": "< -2", "color": "#e31a1c"},
-]
+# Load your SPI GeoJSON data
+def load_spi_data():
+    # Use geopandas to load the SPI GeoJSON (file is in the same directory as app.py)
+    gdf = gpd.read_file('SPI_12_GeoJSON.geojson')  # File is in the same directory as app.py
+    return gdf
 
-# Generate legend dynamically
-legend_html = "<div style='position: fixed; bottom: 10px; left: 10px; border:2px solid grey; z-index:9999; background-color:white; padding:10px; font-size:14px;'><b>Legend:</b><ul style='list-style-type:none; padding-left: 0;'>"
-for category in spi_categories:
-    legend_html += f"<li><span style='background-color:{category['color']}; color:white; padding:2px 5px;'>&nbsp;&nbsp;</span> {category['range']} ({category['name']})</li>"
-legend_html += "</ul></div>"
+# Function to display SPI data on a map
+def plot_spi_map():
+    gdf = load_spi_data()
+    
+    # Create a simple map of SPI data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    gdf.plot(ax=ax, cmap='viridis', legend=True)
+    ax.set_title("SPI 12 Month (2023) - Drought Index")
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
 
-# Add the legend to the Streamlit app
-st.components.v1.html(legend_html, height=200)
+    st.pyplot(fig)
 
-# Map styling function (uses the same categories and colors)
-def style_function(feature):
-    spi = feature['properties']['SPI']
-    for category in spi_categories:
-        if eval(f"spi {category['range']}"):
-            return {'fillColor': category['color'], 'color': category['color']}
+# Function to display information and instructions
+def display_info():
+    st.title("Drought Monitoring Web Application")
+    st.write(
+        """
+        This application displays the SPI data for monitoring drought conditions. The SPI data is used to assess precipitation deficit and drought severity. 
+        The map above shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
+        """
+    )
 
-# Load the SPI GeoJSON file
-geojson_file = "SPI_12_GeoJSON.geojson"
+# Main application function
+def main():
+    display_info()
+    plot_spi_map()
 
-# Create a Folium map
-m = folium.Map(location=[35.5, 44.0], zoom_start=6)
-folium.GeoJson(
-    geojson_file,
-    style_function=style_function
-).add_to(m)
-
-# Display the map in the Streamlit app
-st_folium(m, width=700, height=500)
-
-
+if __name__ == "__main__":
+    main()
