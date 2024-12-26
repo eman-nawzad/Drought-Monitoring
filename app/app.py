@@ -25,13 +25,13 @@ def create_interactive_map():
         gdf,
         name="SPI Data",
         style_function=lambda feature: {
-            "fillColor": "#0073e6" if feature["properties"]["value"] < 0 else "#ffcc00",
+            "fillColor": "#0073e6" if feature["properties"]["SPI"] < 0 else "#ffcc00",
             "color": "black",
             "weight": 0.5,
             "fillOpacity": 0.7,
         },
         tooltip=folium.GeoJsonTooltip(
-            fields=["value"],  # Replace with your GeoJSON property name for SPI values
+            fields=["SPI"],  # Replace with the correct key
             aliases=["SPI Value:"],
             localize=True,
         ),
@@ -64,4 +64,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
