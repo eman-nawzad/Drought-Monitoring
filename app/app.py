@@ -62,7 +62,7 @@ def display_about():
 def main():
     # Add sidebar for navigation
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio( ["Home", "About"])
+    page = st.sidebar.radio( ["Go to ", "Home", "About"])
     
     # Render the selected page
     if page == "Home":
