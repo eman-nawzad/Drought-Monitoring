@@ -66,19 +66,3 @@ def display_about():
         """
     )
 
-# Main application function
-def main():
-    display_info()
-    plot_spi_map()
-    # Add sidebar for navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Home", "About"])
-    
-    # Render the selected page
-    if page == "Home":
-        display_home()
-    elif page == "About":
-        display_about()
-
-if __name__ == "__main__":
-    main()
