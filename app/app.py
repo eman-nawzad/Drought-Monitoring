@@ -13,8 +13,12 @@ def load_spi_data():
 def create_spi_map():
     gdf = load_spi_data()
     
-    # Initialize the folium map
-    m = folium.Map(location=[gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()], zoom_start=6, tiles='OpenStreetMap')
+    # Ensure the GeoDataFrame has valid geometries
+    gdf = gdf[gdf.geometry.notnull()]
+    
+    # Initialize the folium map at the center of the GeoDataFrame
+    centroid = gdf.geometry.unary_union.centroid
+    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
     # Add SPI GeoJSON data to the map
     folium.GeoJson(
@@ -42,7 +46,7 @@ def display_home():
         """
     )
     m = create_spi_map()
-    st_folium(m, width=700, height=500)
+    st_folium(m, width=700, height=500)  # Display the folium map in Streamlit
 
 # Function to display the about page
 def display_about():
@@ -68,5 +72,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
