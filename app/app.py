@@ -1,25 +1,32 @@
 import streamlit as st
 import geopandas as gpd
+import matplotlib.pyplot as plt
 import folium
 from streamlit_folium import st_folium
 
 # Load your SPI GeoJSON data
 def load_spi_data():
     # Use geopandas to load the SPI GeoJSON (file is in the same directory as app.py)
+    gdf = gpd.read_file('SPI_12_GeoJSON.geojson')  # File is in the same directory as app.py
     gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
     return gdf
 
+# Function to display SPI data on a map
+def plot_spi_map():
 # Function to create an interactive map with OpenStreetMap
 def create_spi_map():
     gdf = load_spi_data()
-    
-    # Ensure the GeoDataFrame has valid geometries
-    gdf = gdf[gdf.geometry.notnull()]
-    
-    # Initialize the folium map at the center of the GeoDataFrame
-    centroid = gdf.geometry.unary_union.centroid
-    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
+    # Create a simple map of SPI data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    gdf.plot(ax=ax, cmap='viridis', legend=True)
+    ax.set_title("SPI 12 Month (2023) - Drought Index")
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
+    # Initialize the folium map
+    m = folium.Map(location=[gdf.geometry.centroid.y.mean(), gdf.geometry.centroid.x.mean()], zoom_start=6, tiles='OpenStreetMap')
+
+    st.pyplot(fig)
     # Add SPI GeoJSON data to the map
     folium.GeoJson(
         gdf,
@@ -33,21 +40,22 @@ def create_spi_map():
         tooltip=folium.GeoJsonTooltip(fields=["value"], aliases=["SPI Value:"]),
     ).add_to(m)
 
+# Function to display information and instructions
+def display_info():
     folium.LayerControl().add_to(m)
     return m
-
 # Function to display the home page
 def display_home():
     st.title("Drought Monitoring Web Application")
     st.write(
         """
         This application displays the SPI data for monitoring drought conditions. The SPI data is used to assess precipitation deficit and drought severity. 
+        The map above shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
         The map below shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
         """
     )
     m = create_spi_map()
-    st_folium(m, width=700, height=500)  # Display the folium map in Streamlit
-
+    st_folium(m, width=700, height=500)
 # Function to display the about page
 def display_about():
     st.title("About")
@@ -60,6 +68,8 @@ def display_about():
 
 # Main application function
 def main():
+    display_info()
+    plot_spi_map()
     # Add sidebar for navigation
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Go to", ["Home", "About"])
@@ -72,4 +82,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
