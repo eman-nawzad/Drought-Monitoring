@@ -5,13 +5,19 @@ from streamlit_folium import st_folium
 
 # Load your SPI GeoJSON data
 def load_spi_data():
-    # Use geopandas to load the SPI GeoJSON (file is in the same directory as app.py)
-    gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
-    return gdf
+    try:
+        gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
+        return gdf
+    except Exception as e:
+        st.error(f"Error loading SPI GeoJSON file: {e}")
+        return None
 
 # Function to create an interactive map with OpenStreetMap
 def create_spi_map():
     gdf = load_spi_data()
+    if gdf is None or gdf.empty:
+        st.warning("No valid SPI data available to display on the map.")
+        return None
     
     # Ensure the GeoDataFrame has valid geometries
     gdf = gdf[gdf.geometry.notnull()]
@@ -46,5 +52,10 @@ def display_home():
         """
     )
     m = create_spi_map()
-    st_folium(m, width=700, height=500)  # Display the folium map in Streamlit
+    if m:
+        st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
+
+# Run the app
+if __name__ == "__main__":
+    display_home()
 
