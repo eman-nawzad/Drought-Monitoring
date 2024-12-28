@@ -7,12 +7,11 @@ from streamlit_folium import st_folium
 # Load the SPI GeoJSON data
 def load_spi_data():
     try:
-        # Use geopandas to load the SPI GeoJSON file
+        # Load the SPI GeoJSON file using geopandas
         gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
         
-        # Debug: Display the column names and first few rows
-        st.write("GeoJSON Columns:", gdf.columns.tolist())
-        st.write("Sample Data:", gdf.head())
+        # Ensure the GeoDataFrame has valid geometries
+        gdf = gdf[gdf.geometry.notnull()]
         
         return gdf
     except Exception as e:
@@ -28,36 +27,21 @@ def create_spi_map():
         st.warning("No valid SPI data available to display on the map.")
         return None
     
-    # Ensure the GeoDataFrame has valid geometries
-    gdf = gdf[gdf.geometry.notnull()]
-    
     # Initialize the folium map at the center of the GeoDataFrame
     centroid = gdf.geometry.unary_union.centroid
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
-
-    # Get a list of all available fields in the GeoJSON data
-    fields = gdf.columns.tolist()
-    
-    # Update these field names based on your GeoJSON file structure
-    style_field = "SPI_value"  # Replace with the actual field for SPI values
-    tooltip_fields = fields[:3]  # Display the first 3 fields as tooltips (customize as needed)
-
-    # Validate the field used for styling
-    if style_field not in gdf.columns:
-        st.error(f"The field '{style_field}' is not available in the data. Choose from: {fields}")
-        return None
 
     # Add SPI GeoJSON data to the map
     folium.GeoJson(
         gdf,
         name="SPI Data",
         style_function=lambda feature: {
-            "fillColor": "blue" if feature["properties"][style_field] > 0 else "red",
+            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
             "color": "black",
             "weight": 0.5,
             "fillOpacity": 0.6,
         },
-        tooltip=folium.GeoJsonTooltip(fields=tooltip_fields, aliases=[f"{field}:" for field in tooltip_fields]),
+        tooltip=folium.GeoJsonTooltip(fields=["id", "first", "label"], aliases=["ID:", "First:", "Label:"]),
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
@@ -73,6 +57,8 @@ def display_home():
         The map below shows the SPI data for the year 2023. Higher values indicate wetter conditions, and lower values indicate drier conditions.
         """
     )
+    
+    # Create and display the map
     m = create_spi_map()
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
@@ -81,6 +67,7 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
