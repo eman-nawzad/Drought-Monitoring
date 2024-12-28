@@ -6,7 +6,11 @@ from streamlit_folium import st_folium
 # Load your SPI GeoJSON data
 def load_spi_data():
     try:
+        # Use geopandas to load the SPI GeoJSON (file is in the same directory as app.py)
         gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
+        if not gdf.empty:
+            # Debug: Display GeoJSON properties to confirm the field names
+            st.write("Sample GeoJSON Properties:", gdf.iloc[0])
         return gdf
     except Exception as e:
         st.error(f"Error loading SPI GeoJSON file: {e}")
@@ -31,12 +35,12 @@ def create_spi_map():
         gdf,
         name="SPI Data",
         style_function=lambda feature: {
-            "fillColor": "blue" if feature["properties"]["value"] > 0 else "red",
+            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
             "color": "black",
             "weight": 0.5,
             "fillOpacity": 0.6,
         },
-        tooltip=folium.GeoJsonTooltip(fields=["value"], aliases=["SPI Value:"]),
+        tooltip=folium.GeoJsonTooltip(fields=["SPI_value"], aliases=["SPI Value:"]),
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
