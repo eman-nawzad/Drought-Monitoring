@@ -31,18 +31,29 @@ def create_spi_map():
     centroid = gdf.geometry.unary_union.centroid
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
-    # Add SPI GeoJSON data to the map
-    folium.GeoJson(
-        gdf,
-        name="SPI Data",
-        style_function=lambda feature: {
-            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
-            "color": "black",
-            "weight": 0.5,
-            "fillOpacity": 0.6,
-        },
-        tooltip=folium.GeoJsonTooltip(fields=["id", "first", "label"], aliases=["ID:", "First:", "Label:"]),
-    ).add_to(m)
+    # Check for multiple layers and add them to the map
+    # GeoDataFrame may contain multiple layers, handle that
+    layers = gdf['geometry'].apply(lambda x: x.__class__.__name__).unique()
+
+    # Add each layer to the map
+    for layer in layers:
+        # Filter the data by geometry type and add it to the map
+        layer_data = gdf[gdf['geometry'].apply(lambda x: x.__class__.__name__) == layer]
+        
+        if layer_data.empty:
+            continue
+        
+        folium.GeoJson(
+            layer_data,
+            name=f"{layer} Data",
+            style_function=lambda feature: {
+                "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
+                "color": "black",
+                "weight": 0.5,
+                "fillOpacity": 0.6,
+            },
+            tooltip=folium.GeoJsonTooltip(fields=["id", "first", "label"], aliases=["ID:", "First:", "Label:"]),
+        ).add_to(m)
 
     folium.LayerControl().add_to(m)
     return m
@@ -67,6 +78,7 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
