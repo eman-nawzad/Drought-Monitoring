@@ -47,4 +47,4 @@ def display_home():
     )
     m = create_spi_map()
     st_folium(m, width=700, height=500)  # Display the folium map in Streamlit
-)
+
