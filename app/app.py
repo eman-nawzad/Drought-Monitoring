@@ -10,6 +10,10 @@ def load_spi_data():
         # Load the SPI GeoJSON file using geopandas
         gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
         
+        # Display the first few rows of the GeoDataFrame for debugging
+        st.write("Loaded GeoDataFrame:")
+        st.write(gdf.head())
+
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
         
@@ -34,7 +38,10 @@ def create_spi_map():
     # Check for multiple layers and add them to the map
     # GeoDataFrame may contain multiple layers, handle that
     layers = gdf['geometry'].apply(lambda x: x.__class__.__name__).unique()
-
+    
+    # Debugging: Show the layers and their types
+    st.write("Found layers:", layers)
+    
     # Add each layer to the map
     for layer in layers:
         # Filter the data by geometry type and add it to the map
@@ -42,6 +49,9 @@ def create_spi_map():
         
         if layer_data.empty:
             continue
+        
+        # Check the fields in the GeoJSON to confirm SPI_value exists
+        st.write(f"Fields for layer '{layer}':", layer_data.columns)
         
         folium.GeoJson(
             layer_data,
@@ -78,6 +88,7 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
