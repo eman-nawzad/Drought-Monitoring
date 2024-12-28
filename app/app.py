@@ -35,12 +35,12 @@ def create_spi_map():
         gdf,
         name="SPI Data",
         style_function=lambda feature: {
-            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
+            "fillColor": "blue" if feature["properties"]["label"] == "Positive" else "red",
             "color": "black",
             "weight": 0.5,
             "fillOpacity": 0.6,
         },
-        tooltip=folium.GeoJsonTooltip(fields=["SPI_value"], aliases=["SPI Value:"]),
+        tooltip=folium.GeoJsonTooltip(fields=["id", "first", "label"], aliases=["ID:", "First:", "Label:"]),
     ).add_to(m)
 
     folium.LayerControl().add_to(m)
@@ -62,4 +62,5 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
