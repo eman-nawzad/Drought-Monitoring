@@ -48,28 +48,3 @@ def display_home():
     m = create_spi_map()
     st_folium(m, width=700, height=500)  # Display the folium map in Streamlit
 
-# Function to display the about page
-def display_about():
-    st.title("About")
-    st.write(
-        """
-        This web application is designed to help monitor drought conditions using the Standardized Precipitation Index (SPI).
-        The data visualized in this app represents drought conditions for the year 2023. It helps identify regions with precipitation deficits or surpluses.
-        """
-    )
-
-# Main application function
-def main():
-    # Add sidebar for navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio( ["Go to ", "Home", "About"])
-    
-    # Render the selected page
-    if page == "Home":
-        display_home()
-    elif page == "About":
-        display_about()
-
-if __name__ == "__main__":
-    main()
-
