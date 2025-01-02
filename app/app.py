@@ -13,10 +13,9 @@ def load_spi_data():
     try:
         # Load the SPI GeoJSON file using geopandas
         gdf = gpd.read_file(SPI_GEOJSON_PATH)
-        
+        st.write(f"Loaded {len(gdf)} SPI features.")  # Debugging line
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
-        
         return gdf
     except Exception as e:
         st.error(f"Error loading SPI GeoJSON file: {e}")
@@ -27,10 +26,9 @@ def load_svi_ndvi_data():
     try:
         # Load the SVI/NDVI GeoJSON file using geopandas
         gdf = gpd.read_file(SVI_NDVI_GEOJSON_PATH)
-        
+        st.write(f"Loaded {len(gdf)} SVI/NDVI features.")  # Debugging line
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
-        
         return gdf
     except Exception as e:
         st.error(f"Error loading SVI/NDVI GeoJSON file: {e}")
@@ -112,6 +110,7 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
