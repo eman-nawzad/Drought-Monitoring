@@ -64,7 +64,6 @@ def create_spi_map():
             "weight": 0.5,
             "fillOpacity": 0.6,
         },
-        tooltip=folium.GeoJsonTooltip(fields=["id", "label"], aliases=["ID:", "Label:"]),
     ).add_to(m)
     
     # Add SVI/NDVI data layer to the map
@@ -77,7 +76,6 @@ def create_spi_map():
             "weight": 0.5,
             "fillOpacity": 0.6,
         },
-        tooltip=folium.GeoJsonTooltip(fields=["id", "label"], aliases=["ID:", "Label:"]),
     ).add_to(m)
 
     # Add a layer control to toggle between layers
