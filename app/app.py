@@ -77,8 +77,8 @@ def create_map():
         },
     ).add_to(m)
 
-    # Add a LayerControl for layer selection inside the map at the top right
-    folium.LayerControl(position='topright').add_to(m)
+    # Add a LayerControl for layer selection inside the map
+    folium.LayerControl(position='topleft').add_to(m)
     
     return m
 
@@ -101,6 +101,7 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
