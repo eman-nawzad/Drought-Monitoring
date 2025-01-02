@@ -13,9 +13,10 @@ def load_spi_data():
     try:
         # Load the SPI GeoJSON file using geopandas
         gdf = gpd.read_file(SPI_GEOJSON_PATH)
-        st.write(f"Loaded {len(gdf)} SPI features.")  # Debugging line
+        
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
+        
         return gdf
     except Exception as e:
         st.error(f"Error loading SPI GeoJSON file: {e}")
@@ -26,16 +27,17 @@ def load_svi_ndvi_data():
     try:
         # Load the SVI/NDVI GeoJSON file using geopandas
         gdf = gpd.read_file(SVI_NDVI_GEOJSON_PATH)
-        st.write(f"Loaded {len(gdf)} SVI/NDVI features.")  # Debugging line
+        
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
+        
         return gdf
     except Exception as e:
         st.error(f"Error loading SVI/NDVI GeoJSON file: {e}")
         return None
 
 # Function to create an interactive map with layers
-def create_map(zoom_level, tile_type):
+def create_map():
     # Load both SPI and SVI datasets
     spi_data = load_spi_data()
     svi_data = load_svi_ndvi_data()
@@ -49,10 +51,10 @@ def create_map(zoom_level, tile_type):
     
     # Initialize the folium map at the center of the GeoDataFrames
     centroid = spi_data.geometry.unary_union.centroid
-    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles=tile_type)
+    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
     # Add the SPI layer to the map
-    spi_layer = folium.GeoJson(
+    folium.GeoJson(
         spi_data,
         name="SPI Data",
         style_function=lambda feature: {
@@ -62,9 +64,9 @@ def create_map(zoom_level, tile_type):
             "fillOpacity": 0.6,
         },
     ).add_to(m)
-
+    
     # Add the SVI/NDVI layer to the map
-    svi_layer = folium.GeoJson(
+    folium.GeoJson(
         svi_data,
         name="SVI/NDVI Data",
         style_function=lambda feature: {
@@ -75,8 +77,8 @@ def create_map(zoom_level, tile_type):
         },
     ).add_to(m)
 
-    # Add LayerControl to allow users to toggle the layers on the map
-    folium.LayerControl(position='topright').add_to(m)
+    # Add a LayerControl for layer selection inside the map
+    folium.LayerControl(position='topleft').add_to(m)
     
     return m
 
@@ -87,23 +89,12 @@ def display_home():
         """
         This application displays both the SPI and SVI/NDVI data for monitoring drought conditions. 
         The SPI data is used to assess precipitation deficit and drought severity, while the SVI/NDVI data is used to assess vegetation health. 
-        Use the sidebar to control the map's settings.
+        You can toggle between the layers using the map's layer selector.
         """
     )
-
-    # Sidebar controls for the user to interact with
-    st.sidebar.title("Map Controls")
     
-    # Control for zoom level
-    zoom_level = st.sidebar.slider("Zoom Level", min_value=1, max_value=18, value=6, step=1)
-    
-    # Control for map tile layer
-    tile_type = st.sidebar.selectbox("Select Map Tile", ["OpenStreetMap", "Stamen Terrain", "Stamen Toner", "Stamen Watercolor"])
-
-    # Create and display the map with the selected settings
-    m = create_map(zoom_level, tile_type)
-
-    # Display the map
+    # Create and display the map
+    m = create_map()
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
 
