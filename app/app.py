@@ -36,8 +36,8 @@ def load_svi_ndvi_data():
         st.error(f"Error loading SVI/NDVI GeoJSON file: {e}")
         return None
 
-# Function to create an interactive map with both layers
-def create_map():
+# Function to create an interactive map with the selected layer
+def create_map(selected_layer):
     # Load both SPI and SVI datasets
     spi_data = load_spi_data()
     svi_data = load_svi_ndvi_data()
@@ -53,29 +53,29 @@ def create_map():
     centroid = spi_data.geometry.unary_union.centroid
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
-    # Add the SPI data to the map
-    folium.GeoJson(
-        spi_data,
-        name="SPI Data",
-        style_function=lambda feature: {
-            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
-            "color": "black",
-            "weight": 0.5,
-            "fillOpacity": 0.6,
-        },
-    ).add_to(m)
-
-    # Add the SVI/NDVI data to the map
-    folium.GeoJson(
-        svi_data,
-        name="SVI/NDVI Data",
-        style_function=lambda feature: {
-            "fillColor": "green" if feature["properties"].get("NDVI_value", 0) > 0 else "yellow",
-            "color": "black",
-            "weight": 0.5,
-            "fillOpacity": 0.6,
-        },
-    ).add_to(m)
+    # Add the selected layer to the map
+    if selected_layer == "SPI Data":
+        folium.GeoJson(
+            spi_data,
+            name="SPI Data",
+            style_function=lambda feature: {
+                "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
+                "color": "black",
+                "weight": 0.5,
+                "fillOpacity": 0.6,
+            },
+        ).add_to(m)
+    elif selected_layer == "SVI/NDVI Data":
+        folium.GeoJson(
+            svi_data,
+            name="SVI/NDVI Data",
+            style_function=lambda feature: {
+                "fillColor": "green" if feature["properties"].get("NDVI_value", 0) > 0 else "yellow",
+                "color": "black",
+                "weight": 0.5,
+                "fillOpacity": 0.6,
+            },
+        ).add_to(m)
 
     # Add a layer control to toggle between layers
     folium.LayerControl().add_to(m)
@@ -89,18 +89,22 @@ def display_home():
         """
         This application displays both the SPI and SVI/NDVI data for monitoring drought conditions. 
         The SPI data is used to assess precipitation deficit and drought severity, while the SVI/NDVI data is used to assess vegetation health. 
-        Use the layer control on the map to toggle between the datasets.
+        Use the layer selector below to choose which dataset to display on the map.
         """
     )
     
-    # Create and display the map with both layers
-    m = create_map()
+    # Add a selector for choosing the layer (SPI or SVI/NDVI)
+    selected_layer = st.radio("Select Dataset to Display:", ["SPI Data", "SVI/NDVI Data"])
+
+    # Create and display the map with the selected layer
+    m = create_map(selected_layer)
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
 
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
