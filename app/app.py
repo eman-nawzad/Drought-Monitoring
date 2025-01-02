@@ -79,9 +79,6 @@ def create_map(zoom_level, tile_type, show_spi, show_svi):
             },
         ).add_to(m)
 
-    # Add a LayerControl for layer selection inside the map
-    folium.LayerControl(position='topright').add_to(m)
-    
     return m
 
 # Function to display the home page
@@ -101,7 +98,7 @@ def display_home():
     # Control for zoom level
     zoom_level = st.sidebar.slider("Zoom Level", min_value=1, max_value=18, value=6, step=1)
     
-    # Control for map tile layer
+    # Control for map tile layer (adjusted to allow proper working of base maps)
     tile_type = st.sidebar.selectbox("Select Map Tile", ["OpenStreetMap", "Stamen Terrain", "Stamen Toner", "Stamen Watercolor"])
 
     # Control for which layers to display
