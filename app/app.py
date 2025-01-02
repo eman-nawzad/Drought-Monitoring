@@ -2,13 +2,16 @@ import streamlit as st
 import geopandas as gpd
 import folium
 from streamlit_folium import st_folium
+import os
 
+# Define the path to the SPI GeoJSON file
+SPI_GEOJSON_PATH = os.path.join('data', 'SPI_12_GeoJSON.geojson')
 
 # Load the SPI GeoJSON data
 def load_spi_data():
     try:
         # Load the SPI GeoJSON file using geopandas
-        gdf = gpd.read_file('SPI_12_GeoJSON.geojson')
+        gdf = gpd.read_file(SPI_GEOJSON_PATH)
         
         # Ensure the GeoDataFrame has valid geometries
         gdf = gdf[gdf.geometry.notnull()]
@@ -32,7 +35,6 @@ def create_spi_map():
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
     # Check for multiple layers and add them to the map
-    # GeoDataFrame may contain multiple layers, handle that
     layers = gdf['geometry'].apply(lambda x: x.__class__.__name__).unique()
 
     # Add each layer to the map
