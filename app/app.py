@@ -37,7 +37,7 @@ def load_svi_ndvi_data():
         return None
 
 # Function to create an interactive map with layers
-def create_map(zoom_level, tile_type, show_spi, show_svi):
+def create_map(zoom_level, tile_type):
     # Load both SPI and SVI datasets
     spi_data = load_spi_data()
     svi_data = load_svi_ndvi_data()
@@ -53,32 +53,33 @@ def create_map(zoom_level, tile_type, show_spi, show_svi):
     centroid = spi_data.geometry.unary_union.centroid
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles=tile_type)
 
-    # Add the SPI layer if selected
-    if show_spi:
-        folium.GeoJson(
-            spi_data,
-            name="SPI Data",
-            style_function=lambda feature: {
-                "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
-                "color": "black",
-                "weight": 0.5,
-                "fillOpacity": 0.6,
-            },
-        ).add_to(m)
+    # Add the SPI layer to the map
+    spi_layer = folium.GeoJson(
+        spi_data,
+        name="SPI Data",
+        style_function=lambda feature: {
+            "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
+            "color": "black",
+            "weight": 0.5,
+            "fillOpacity": 0.6,
+        },
+    ).add_to(m)
 
-    # Add the SVI/NDVI layer if selected
-    if show_svi:
-        folium.GeoJson(
-            svi_data,
-            name="SVI/NDVI Data",
-            style_function=lambda feature: {
-                "fillColor": "green" if feature["properties"].get("NDVI_value", 0) > 0 else "yellow",
-                "color": "black",
-                "weight": 0.5,
-                "fillOpacity": 0.6,
-            },
-        ).add_to(m)
+    # Add the SVI/NDVI layer to the map
+    svi_layer = folium.GeoJson(
+        svi_data,
+        name="SVI/NDVI Data",
+        style_function=lambda feature: {
+            "fillColor": "green" if feature["properties"].get("NDVI_value", 0) > 0 else "yellow",
+            "color": "black",
+            "weight": 0.5,
+            "fillOpacity": 0.6,
+        },
+    ).add_to(m)
 
+    # Add LayerControl to allow users to toggle the layers on the map
+    folium.LayerControl(position='topright').add_to(m)
+    
     return m
 
 # Function to display the home page
@@ -98,21 +99,20 @@ def display_home():
     # Control for zoom level
     zoom_level = st.sidebar.slider("Zoom Level", min_value=1, max_value=18, value=6, step=1)
     
-    # Control for map tile layer (adjusted to allow proper working of base maps)
+    # Control for map tile layer
     tile_type = st.sidebar.selectbox("Select Map Tile", ["OpenStreetMap", "Stamen Terrain", "Stamen Toner", "Stamen Watercolor"])
 
-    # Control for which layers to display
-    show_spi = st.sidebar.checkbox("Show SPI Data", value=True)
-    show_svi = st.sidebar.checkbox("Show SVI/NDVI Data", value=True)
-
     # Create and display the map with the selected settings
-    m = create_map(zoom_level, tile_type, show_spi, show_svi)
+    m = create_map(zoom_level, tile_type)
+
+    # Display the map
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
 
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
