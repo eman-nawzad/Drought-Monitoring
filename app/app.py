@@ -37,7 +37,7 @@ def load_svi_ndvi_data():
         return None
 
 # Function to create an interactive map with layers
-def create_map():
+def create_map(zoom_level):
     # Load both SPI and SVI datasets
     spi_data = load_spi_data()
     svi_data = load_svi_ndvi_data()
@@ -51,7 +51,7 @@ def create_map():
     
     # Initialize the folium map at the center of the GeoDataFrames
     centroid = spi_data.geometry.unary_union.centroid
-    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
+    m = folium.Map(location=[centroid.y, centroid.x], zoom_start=zoom_level, tiles='OpenStreetMap')
 
     # Add the SPI layer to the map
     folium.GeoJson(
@@ -93,14 +93,19 @@ def display_home():
         """
     )
     
+    # Sidebar for zoom level control
+    st.sidebar.header("Map Controls")
+    zoom_level = st.sidebar.slider("Zoom Level", min_value=1, max_value=18, value=6, step=1)
+
     # Create and display the map
-    m = create_map()
+    m = create_map(zoom_level)
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
 
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
