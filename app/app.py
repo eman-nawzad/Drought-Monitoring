@@ -77,8 +77,8 @@ def create_map(selected_layer):
             },
         ).add_to(m)
 
-    # Add a layer control to toggle between layers
-    folium.LayerControl().add_to(m)
+    # Add a layer control to toggle between layers on the side
+    folium.LayerControl(position='topleft').add_to(m)
     
     return m
 
@@ -104,6 +104,8 @@ def display_home():
 # Run the app
 if __name__ == "__main__":
     display_home()
+
+
 
 
 
