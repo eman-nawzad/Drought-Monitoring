@@ -77,7 +77,7 @@ def create_map():
         },
     ).add_to(m)
 
-    # Add a LayerControl for layer selection inside the map
+    # Add a LayerControl for layer selection inside the map at the top right
     folium.LayerControl(position='topright').add_to(m)
     
     return m
