@@ -37,27 +37,19 @@ def load_svi_ndvi_data():
         return None
 
 # Function to create an interactive map
-def create_spi_map():
-    # Load both datasets
-    spi_gdf = load_spi_data()
-    svi_ndvi_gdf = load_svi_ndvi_data()
-    
-    if spi_gdf is None or spi_gdf.empty:
-        st.warning("No valid SPI data available to display on the map.")
-        return None
-    
-    if svi_ndvi_gdf is None or svi_ndvi_gdf.empty:
-        st.warning("No valid SVI/NDVI data available to display on the map.")
+def create_map(data, layer_name):
+    if data is None or data.empty:
+        st.warning(f"No valid {layer_name} data available to display on the map.")
         return None
     
     # Initialize the folium map at the center of the GeoDataFrame
-    centroid = spi_gdf.geometry.unary_union.centroid
+    centroid = data.geometry.unary_union.centroid
     m = folium.Map(location=[centroid.y, centroid.x], zoom_start=6, tiles='OpenStreetMap')
 
-    # Add SPI data layer to the map
+    # Add the selected dataset to the map
     folium.GeoJson(
-        spi_gdf,
-        name="SPI Data",
+        data,
+        name=layer_name,
         style_function=lambda feature: {
             "fillColor": "blue" if feature["properties"].get("SPI_value", 0) > 0 else "red",
             "color": "black",
@@ -65,20 +57,8 @@ def create_spi_map():
             "fillOpacity": 0.6,
         },
     ).add_to(m)
-    
-    # Add SVI/NDVI data layer to the map
-    folium.GeoJson(
-        svi_ndvi_gdf,
-        name="SVI/NDVI Data",
-        style_function=lambda feature: {
-            "fillColor": "green" if feature["properties"].get("NDVI_value", 0) > 0.5 else "yellow",
-            "color": "black",
-            "weight": 0.5,
-            "fillOpacity": 0.6,
-        },
-    ).add_to(m)
 
-    # Add a layer control to toggle between layers
+    # Add a layer control to toggle between layers (if any)
     folium.LayerControl().add_to(m)
     
     return m
@@ -88,19 +68,35 @@ def display_home():
     st.title("Drought Monitoring Web Application")
     st.write(
         """
-        This application displays the SPI and SVI/NDVI data for monitoring drought conditions. The SPI data is used to assess precipitation deficit and drought severity, while the SVI/NDVI data is used to assess vegetation health. 
-        The map below shows both datasets for the year 2023.
+        This application displays either the SPI or SVI/NDVI data for monitoring drought conditions. 
+        The SPI data is used to assess precipitation deficit and drought severity, while the SVI/NDVI data is used to assess vegetation health. 
+        Use the dropdown below to choose which dataset you want to visualize.
         """
     )
     
-    # Create and display the map
-    m = create_spi_map()
+    # Allow user to choose between SPI and SVI datasets
+    dataset_choice = st.selectbox(
+        "Select the dataset to display:",
+        ("SPI", "SVI/NDVI")
+    )
+    
+    # Load the corresponding dataset based on user choice
+    if dataset_choice == "SPI":
+        data = load_spi_data()
+        layer_name = "SPI Data"
+    else:
+        data = load_svi_ndvi_data()
+        layer_name = "SVI/NDVI Data"
+    
+    # Create and display the selected map
+    m = create_map(data, layer_name)
     if m:
         st_folium(m, width=800, height=600)  # Display the folium map in Streamlit
 
 # Run the app
 if __name__ == "__main__":
     display_home()
+
 
 
 
