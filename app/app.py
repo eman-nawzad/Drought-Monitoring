@@ -5,7 +5,7 @@ import geopandas as gpd
 
 # Define dataset paths
 data_files = {
-    "SPI Drought Severity": "data/SPI_12_2023.geojson"  # Replace with the correct path to your GeoJSON file
+    "SPI Drought Severity": "data/SPI.geojson"  # Replace with the correct path to your GeoJSON file
 }
 
 # Drought severity classes
