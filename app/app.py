@@ -26,7 +26,7 @@ else:
         0: "Extreme Drought (Red)",
         1: "Severe Drought (Orange)",
         2: "Moderate Drought (Yellow)",
-        3: "Mild Drought (blue)",
+        3: "Mild Drought (Light Yellow)",
         4: "Normal/Above (Green)"
     }
 
@@ -35,7 +35,7 @@ else:
         0: "red",
         1: "orange",
         2: "yellow",
-        3: "blue",
+        3: "lightyellow",
         4: "green"
     }
 
@@ -72,6 +72,8 @@ else:
     # Function to set color based on drought severity
     def get_style_function(feature):
         severity = feature['properties']['drought_severity']
+        if drought_filter == "All":  # If 'All' is selected, use a neutral color (gray)
+            return {"color": "gray", "weight": 1, "fillOpacity": 0.6}
         color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
         return {"color": color, "weight": 1, "fillOpacity": 0.6}
 
@@ -101,6 +103,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
