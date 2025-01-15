@@ -26,7 +26,7 @@ else:
         0: "Extreme Drought (Red)",
         1: "Severe Drought (Orange)",
         2: "Moderate Drought (Yellow)",
-        3: "Mild Drought (Light Yellow)",
+        3: "Mild Drought (blue)",
         4: "Normal/Above (Green)"
     }
 
@@ -35,7 +35,7 @@ else:
         0: "red",
         1: "orange",
         2: "yellow",
-        3: "lightyellow",
+        3: "blue",
         4: "green"
     }
 
