@@ -23,11 +23,11 @@ if 'drought_severity' not in gdf.columns:
 else:
     # Drought severity classes and colors
     drought_severity_classes = {
-        0: "Extreme Drought (Red)",
-        1: "Severe Drought (Orange)",
-        2: "Moderate Drought (Yellow)",
-        3: "Mild Drought (Light Yellow)",
-        4: "Normal/Above (Green)"
+        0: "Extreme Drought ",
+        1: "Severe Drought ",
+        2: "Moderate Drought ",
+        3: "Mild Drought ",
+        4: "Normal/Above"
     }
 
     # Drought severity colors
@@ -35,7 +35,7 @@ else:
         0: "red",
         1: "orange",
         2: "yellow",
-        3: "lightyellow",
+        3: "blue",
         4: "green"
     }
 
