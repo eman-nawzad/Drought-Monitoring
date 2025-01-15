@@ -90,10 +90,18 @@ else:
     # Add the filtered GeoJSON layer
     add_geojson_layer(filtered_gdf, m)
 
+    # Adjust the map view to the bounding box of the selected class
+    if drought_filter != "All" and not filtered_gdf.empty:
+        # Get the bounding box of the selected class
+        bounds = filtered_gdf.geometry.total_bounds  # [minx, miny, maxx, maxy]
+        # Zoom to the bounding box
+        m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+
     folium.LayerControl().add_to(m)
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
