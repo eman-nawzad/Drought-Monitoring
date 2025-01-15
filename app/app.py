@@ -56,8 +56,11 @@ else:
     else:
         st.sidebar.success(f"Displaying data from the '{data_file}' dataset.")
 
-    # Create map
-    m = folium.Map(location=[filtered_gdf.geometry.centroid.y.mean(), filtered_gdf.geometry.centroid.x.mean()], zoom_start=12)
+    # Create map centered on the centroid of the dataset
+    centroid = filtered_gdf.geometry.centroid
+    avg_lat = centroid.y.mean()
+    avg_lon = centroid.x.mean()
+    m = folium.Map(location=[avg_lat, avg_lon], zoom_start=12)
 
     # Function to generate popups with drought severity
     def generate_popup(row):
@@ -70,12 +73,12 @@ else:
     def get_style_function(feature):
         severity = feature['properties']['drought_severity']
         color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
-        return {"color": color, "weight": 1}
+        return {"color": color, "weight": 1, "fillOpacity": 0.6}
 
     # Add GeoJSON layer with popups and colors
     def add_geojson_layer(gdf, map_obj):
         geo_json = folium.GeoJson(
-            gdf.geometry,
+            gdf,
             style_function=get_style_function,
             name="SPI Drought Severity"  # Set the name for LayerControl
         )
@@ -91,6 +94,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
