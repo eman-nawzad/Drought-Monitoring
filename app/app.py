@@ -21,13 +21,22 @@ show_all_layers = st.sidebar.checkbox("Show All Layers")
 if 'drought_severity' not in gdf.columns:
     st.error("The dataset does not contain a 'drought_severity' column.")
 else:
-    # Drought severity classes
+    # Drought severity classes and colors
     drought_severity_classes = {
         0: "Extreme Drought (Red)",
         1: "Severe Drought (Orange)",
         2: "Moderate Drought (Yellow)",
         3: "Mild Drought (Light Yellow)",
         4: "Normal/Above (Green)"
+    }
+
+    # Drought severity colors
+    drought_severity_colors = {
+        0: "red",
+        1: "orange",
+        2: "yellow",
+        3: "lightyellow",
+        4: "green"
     }
 
     # Filter the dataset based on drought severity
@@ -57,14 +66,17 @@ else:
         popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
         return popup_content
 
-    def get_style_function():
-        return lambda x: {"color": "blue", "weight": 1}  # Default styling for SPI data
+    # Function to set color based on drought severity
+    def get_style_function(feature):
+        severity = feature['properties']['drought_severity']
+        color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
+        return {"color": color, "weight": 1}
 
-    # Add GeoJSON layer with popups
+    # Add GeoJSON layer with popups and colors
     def add_geojson_layer(gdf, map_obj):
         geo_json = folium.GeoJson(
             gdf.geometry,
-            style_function=get_style_function(),
+            style_function=get_style_function,
             name="SPI Drought Severity"  # Set the name for LayerControl
         )
         for _, row in gdf.iterrows():
@@ -79,6 +91,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
