@@ -4,7 +4,7 @@ from streamlit_folium import st_folium
 import geopandas as gpd
 
 # Define dataset paths
-data_file = "data/spi_(1).geojson"  # Replace with the correct path to your GeoJSON file
+data_file = "data/spi_ (1).geojson"  # Replace with the correct path to your GeoJSON file
 
 # Load the dataset
 gdf = gpd.read_file(data_file)
