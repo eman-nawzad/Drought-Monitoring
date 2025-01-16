@@ -11,21 +11,27 @@ gdf = gpd.read_file(data_file)
 
 # Display the full attribute table
 st.subheader("Attribute Table")
-st.write(gdf)  # This will display the entire GeoDataFrame to inspect column names
+st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
 show_all_layers = st.sidebar.checkbox("Show All Layers")
 
-# Time frame filter
-if "month" in gdf.columns:
-    months = sorted(gdf["month"].unique())  # Get unique months from the dataset
-    selected_month = st.sidebar.selectbox("Select a Month", ["All"] + months)
+# Identify columns corresponding to months
+month_columns = [
+    col for col in gdf.columns
+    if col.lower() in ["january", "february", "march", "april", "may", "june", 
+                       "july", "august", "september", "october", "november", "december"]
+]
 
-    if selected_month != "All":
-        gdf = gdf[gdf["month"] == selected_month]
+# Allow users to select months
+selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
+
+# Aggregate data based on selected months
+if selected_months:
+    gdf["selected_months_avg"] = gdf[selected_months].mean(axis=1)
 else:
-    st.sidebar.warning("The dataset does not contain a 'month' column for filtering.")
+    gdf["selected_months_avg"] = 0
 
 # Check if 'drought_severity' column exists in the data
 if 'drought_severity' not in gdf.columns:
@@ -77,6 +83,7 @@ else:
         popup_content = f"<strong>Feature Information</strong><br>"
         severity_class = drought_severity_classes.get(row['drought_severity'], "Unknown")
         popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
+        popup_content += f"<b>Average SPI (Selected Months):</b> {row['selected_months_avg']:.2f}<br>"
         return popup_content
 
     # Function to set color based on drought severity
@@ -113,6 +120,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
