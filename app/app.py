@@ -17,16 +17,26 @@ st.write(gdf)  # This will display the entire GeoDataFrame to inspect column nam
 st.sidebar.title("SPI Drought Severity Map Viewer")
 show_all_layers = st.sidebar.checkbox("Show All Layers")
 
+# Time frame filter
+if "month" in gdf.columns:
+    months = sorted(gdf["month"].unique())  # Get unique months from the dataset
+    selected_month = st.sidebar.selectbox("Select a Month", ["All"] + months)
+
+    if selected_month != "All":
+        gdf = gdf[gdf["month"] == selected_month]
+else:
+    st.sidebar.warning("The dataset does not contain a 'month' column for filtering.")
+
 # Check if 'drought_severity' column exists in the data
 if 'drought_severity' not in gdf.columns:
     st.error("The dataset does not contain a 'drought_severity' column.")
 else:
     # Drought severity classes and colors
     drought_severity_classes = {
-        0: "Extreme Drought ",
-        1: "Severe Drought ",
-        2: "Moderate Drought ",
-        3: "Mild Drought ",
+        0: "Extreme Drought",
+        1: "Severe Drought",
+        2: "Moderate Drought",
+        3: "Mild Drought",
         4: "Normal/Above"
     }
 
@@ -52,7 +62,7 @@ else:
 
     # Sidebar warning message for no data
     if filtered_gdf.empty:
-        st.sidebar.warning(f"No data available for the selected severity in the '{data_file}' dataset. Please try a different selection.")
+        st.sidebar.warning(f"No data available for the selected filters in the '{data_file}' dataset. Please try a different selection.")
     else:
         st.sidebar.success(f"Displaying data from the '{data_file}' dataset.")
 
@@ -103,6 +113,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
