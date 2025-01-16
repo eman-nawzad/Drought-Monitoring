@@ -9,28 +9,6 @@ data_file = "data/spi.geojson"  # Replace with the correct path to your GeoJSON 
 # Load the dataset
 gdf = gpd.read_file(data_file)
 
-# Function to classify drought severity based on SPI value
-def classify_drought_severity(spi_value):
-    if spi_value >= 2.00:
-        return 'Not a drought (Extremely Wet)'
-    elif 1.50 <= spi_value < 1.99:
-        return 'Not a drought (Very Wet)'
-    elif 1.00 <= spi_value < 1.49:
-        return 'Not a drought (Moderately Wet)'
-    elif -0.99 <= spi_value < 0.99:
-        return 'No drought (Near Normal)'
-    elif -1.00 <= spi_value < -1.49:
-        return 'Moderate drought (Moderately Dry)'
-    elif -1.50 <= spi_value < -1.99:
-        return 'Severe drought (Severely Dry)'
-    elif spi_value <= -2.00:
-        return 'Extreme drought (Extremely Dry)'
-    else:
-        return 'Unknown'
-
-# Apply the function to the selected months' average or directly to the SPI value if needed
-gdf["drought_severity"] = gdf["selected_months_avg"].apply(classify_drought_severity)
-
 # Display the full attribute table
 st.subheader("Attribute Table")
 st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
@@ -49,7 +27,7 @@ month_columns = [
 # Allow users to select months
 selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
 
-# Aggregate data based on selected months
+# Ensure the selected_months list is not empty before computing the average
 if selected_months:
     gdf["selected_months_avg"] = gdf[selected_months].mean(axis=1)
 else:
@@ -142,6 +120,7 @@ else:
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
