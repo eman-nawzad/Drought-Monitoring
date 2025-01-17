@@ -135,11 +135,12 @@ st_folium(m, width=700, height=500)
 
 # Calculate monthly SPI averages over selected months
 if selected_months:
-    monthly_spi = filtered_gdf[selected_months].mean(axis=1)
+    # Compute mean SPI for each month across all features
+    monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
 
-    # Create a line chart
+    # Create a line chart for the selected months
     plt.figure(figsize=(10, 6))
-    plt.plot(selected_months, monthly_spi, marker='o', color='b', linestyle='-', linewidth=2)
+    plt.plot(monthly_avg_spi.index, monthly_avg_spi, marker='o', color='b', linestyle='-', linewidth=2)
     plt.title('Average SPI Over Time (Selected Months)')
     plt.xlabel('Month')
     plt.ylabel('Average SPI')
@@ -148,7 +149,6 @@ if selected_months:
 
     # Display the line chart in the Streamlit app
     st.pyplot(plt)
-
 
 
 
