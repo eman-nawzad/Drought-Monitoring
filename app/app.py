@@ -29,16 +29,17 @@ drought_filter = st.sidebar.selectbox(
         "Severe drought",
         "Moderate drought",
         "Mild drought",
-        "Normal or above"
+        "Normal"
     ]
 )
 
 # Map numeric values to drought severity categories
 drought_severity_mapping = {
-    1: "Extreme drought",
-    2: "Severe drought",
-    3: "Moderate drought",
-    4: "Mild drought",
+    0: "Extreme drought",
+    1: "Severe drought",
+    2: "Moderate drought",
+    3: "Mild drought",
+    4: "Normal",
 }
 
 # Apply drought severity mapping
@@ -75,7 +76,7 @@ drought_severity_colors = {
     "Severe drought": "red",
     "Moderate drought": "orange",
     "Mild drought": "yellow",
-    "Normal or above": "green",
+    "Normal": "green",
 }
 
 def get_style_function(feature):
@@ -109,6 +110,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
