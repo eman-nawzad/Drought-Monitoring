@@ -66,13 +66,13 @@ def generate_popup(row):
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
     return popup_content
 
-# Function to set color based on drought severity
+# Updated color palette using blue, orange, and red
 drought_severity_colors = {
-    "Extreme drought": "darkred",
-    "Severe drought": "red",
-    "Moderate drought": "orange",
-    "Mild drought": "yellow",
-    "Normal or above": "green",
+    "Extreme drought": "darkred",  # Intense red for extreme drought
+    "Severe drought": "red",  # Bright red for severe drought
+    "Moderate drought": "orange",  # Orange for moderate drought
+    "Mild drought": "lightblue",  # Light blue for mild drought
+    "Normal or above": "skyblue",  # Blue for normal or above conditions
 }
 
 def get_style_function(feature):
@@ -106,6 +106,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
