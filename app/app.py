@@ -3,6 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Define dataset paths
 data_file = "data/SPI-J.geojson"  # Replace with the correct path to your GeoJSON file
@@ -23,31 +24,12 @@ show_all_layers = st.sidebar.checkbox("Show All Layers")
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Category", [
-        "All",
-        "Extreme drought",
-        "Severe drought",
-        "Moderate drought",
-        "Mild drought",
-        "Normal"
-    ]
+    "Filter by Drought Category", ["All"] + list(gdf["drought_severity"].unique())
 )
-
-# Map numeric values to drought severity categories
-drought_severity_mapping = {
-    0: "Extreme drought",
-    1: "Severe drought",
-    2: "Moderate drought",
-    3: "Mild drought",
-    4: "Normal",
-}
-
-# Apply drought severity mapping
-gdf["drought severity"] = gdf["drought severity"].map(drought_severity_mapping)
 
 # Filter the dataset based on the drought category
 if drought_filter != "All":
-    filtered_gdf = gdf[gdf["drought severity"] == drought_filter]
+    filtered_gdf = gdf[gdf["drought_severity"] == drought_filter]
 else:
     filtered_gdf = gdf
 
@@ -66,21 +48,23 @@ m = folium.Map(location=[avg_lat, avg_lon], zoom_start=12)
 # Function to generate popups with drought severity
 def generate_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
-    severity_class = row["drought severity"]
+    severity_class = row["drought_severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
     return popup_content
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Extreme drought": "darkred",
-    "Severe drought": "red",
-    "Moderate drought": "orange",
-    "Mild drought": "yellow",
-    "Normal": "green",
+    "Not a drought": "green",
+    "Very Wet": "lightgreen",
+    "Moderately Wet": "yellowgreen",
+    "Near Normal": "yellow",
+    "Moderately Dry": "orange",
+    "Severely Dry": "red",
+    "Extremely Dry": "darkred",
 }
 
 def get_style_function(feature):
-    severity = feature['properties']['drought severity']
+    severity = feature['properties']['drought_severity']
     color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
     return {"color": color, "weight": 1, "fillOpacity": 0.6}
 
@@ -110,6 +94,24 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
+# Calculate monthly SPI averages over selected months
+if drought_filter != "All":
+    # Compute mean SPI for each month across all features
+    monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
+
+    # Create a line chart for the selected months
+    plt.figure(figsize=(10, 6))
+    plt.plot(monthly_avg_spi.index, monthly_avg_spi, marker='o', color='b', linestyle='-', linewidth=2)
+    plt.title('Average SPI Over Time (Selected Months)')
+    plt.xlabel('Month')
+    plt.ylabel('Average SPI')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Display the line chart in the Streamlit app
+    st.pyplot(plt)
+
 
 
 
