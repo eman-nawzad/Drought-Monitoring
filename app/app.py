@@ -19,18 +19,10 @@ st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
-show_all_layers = st.sidebar.checkbox("Show All Layers")
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Category", ["All"] + list(gdf["drought_severity"].unique())
-)
-
-# Sidebar filter for selecting months
-selected_months = st.sidebar.multiselect(
-    "Select months",
-    options=gdf.columns,  # assuming your columns represent different months
-    default=gdf.columns[:1]  # default to the first month or set any initial default
+    "Filter by Drought Severity", ["All"] + list(gdf["drought_severity"].unique())
 )
 
 # Filter the dataset based on the drought category
@@ -39,15 +31,15 @@ if drought_filter != "All":
 else:
     filtered_gdf = gdf
 
-# Apply the selected months filter
-if selected_months:
-    filtered_gdf = filtered_gdf[selected_months]
-
 # Sidebar warning message for no data
 if filtered_gdf.empty:
-    st.sidebar.warning(f"No data available for the selected drought category '{drought_filter}' and months '{selected_months}'. Please try a different selection.")
+    st.sidebar.warning(f"No data available for the selected drought severity '{drought_filter}'. Please try a different selection.")
 else:
-    st.sidebar.success(f"Displaying data for the selected drought category '{drought_filter}' and months '{selected_months}'.")
+    st.sidebar.success(f"Displaying data for the selected drought severity '{drought_filter}'.")
+
+# Display filtered attribute table based on the selected drought severity
+st.subheader(f"Filtered Attribute Table - Drought Severity: {drought_filter}")
+st.write(filtered_gdf)
 
 # Create map centered on the centroid of the dataset
 centroid = filtered_gdf.geometry.centroid
@@ -104,6 +96,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
