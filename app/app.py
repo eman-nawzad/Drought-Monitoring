@@ -66,13 +66,13 @@ def generate_popup(row):
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
     return popup_content
 
-# Updated color palette using blue, orange, and red
+# Updated color palette using new shades for each severity category
 drought_severity_colors = {
-    "Extreme drought": "darkred",  # Intense red for extreme drought
-    "Severe drought": "red",  # Bright red for severe drought
-    "Moderate drought": "orange",  # Orange for moderate drought
-    "Mild drought": "lightblue",  # Light blue for mild drought
-    "Normal or above": "skyblue",  # Blue for normal or above conditions
+    "Extreme drought": "#8B0000",  # Dark red
+    "Severe drought": "#FF4500",  # Red-orange
+    "Moderate drought": "#FFA500",  # Orange
+    "Mild drought": "#FFD700",  # Light orange
+    "Normal or above": "#87CEEB",  # Light blue
 }
 
 def get_style_function(feature):
