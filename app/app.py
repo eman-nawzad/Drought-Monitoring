@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Define dataset paths
-data_file = "data/spi3.geojson"  # Replace with the correct path to your GeoJSON file
+data_file = "data/SPIi (2).geojson"  # Replace with the correct path to your GeoJSON file
 
 # Load the dataset
 gdf = gpd.read_file(data_file)
