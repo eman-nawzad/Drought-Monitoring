@@ -95,23 +95,6 @@ folium.LayerControl().add_to(m)
 # Display the map
 st_folium(m, width=700, height=500)
 
-# Calculate monthly SPI averages over selected months
-if drought_filter != "All":
-    # Compute mean SPI for each month across all features
-    monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
-
-    # Create a line chart for the selected months
-    plt.figure(figsize=(10, 6))
-    plt.plot(monthly_avg_spi.index, monthly_avg_spi, marker='o', color='b', linestyle='-', linewidth=2)
-    plt.title('Average SPI Over Time (Selected Months)')
-    plt.xlabel('Month')
-    plt.ylabel('Average SPI')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Display the line chart in the Streamlit app
-    st.pyplot(plt)
-
 
 
 
