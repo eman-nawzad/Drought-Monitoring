@@ -22,44 +22,9 @@ st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 st.sidebar.title("SPI Drought Severity Map Viewer")
 show_all_layers = st.sidebar.checkbox("Show All Layers")
 
-# Define SPI range categories and corresponding drought severity
-spi_categories = {
-    "Extreme drought": {"min": float("-inf"), "max": -2.00},
-    "Severe drought": {"min": -2.00, "max": -1.50},
-    "Moderate drought": {"min": -1.50, "max": -1.00},
-    "Mild drought": {"min": -1.00, "max": 0.00},
-    "Normal or Above": {"min": 0.00, "max": float("inf")},
-}
-
-# Function to classify drought severity based on SPI
-def classify_drought_severity(spi_value):
-    for category, range_ in spi_categories.items():
-        if range_["min"] <= spi_value <= range_["max"]:
-            return category
-    return "Unknown"  # In case no category matches
-
-# Allow users to select months
-month_columns = [
-    col for col in gdf.columns
-    if col.lower() in ["january", "february", "march", "april", "may", "june", 
-                       "july", "august", "september", "october", "november", "december"]
-]
-
-# Sidebar for selecting months
-selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
-
-# Ensure the selected_months list is not empty before computing the average
-if selected_months:
-    gdf["selected_months_avg"] = gdf[selected_months].mean(axis=1)
-else:
-    gdf["selected_months_avg"] = 0
-
-# Apply drought severity classification based on selected months average
-gdf["drought_severity"] = gdf["selected_months_avg"].apply(classify_drought_severity)
-
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Category", ["All"] + list(spi_categories.keys())
+    "Filter by Drought Category", ["All"] + list(gdf["drought_severity"].unique())
 )
 
 # Filter the dataset based on the drought category
@@ -85,16 +50,17 @@ def generate_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
     severity_class = row["drought_severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
-    popup_content += f"<b>Average SPI (Selected Months):</b> {row['selected_months_avg']:.2f}<br>"
     return popup_content
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Extreme drought": "darkred",
-    "Severe drought": "red",
-    "Moderate drought": "orange",
-    "Mild drought": "yellow",
-    "Normal or Above": "green",
+    "Not a drought": "green",
+    "Very Wet": "lightgreen",
+    "Moderately Wet": "yellowgreen",
+    "Near Normal": "yellow",
+    "Moderately Dry": "orange",
+    "Severely Dry": "red",
+    "Extremely Dry": "darkred",
 }
 
 def get_style_function(feature):
@@ -130,7 +96,7 @@ folium.LayerControl().add_to(m)
 st_folium(m, width=700, height=500)
 
 # Calculate monthly SPI averages over selected months
-if selected_months:
+if drought_filter != "All":
     # Compute mean SPI for each month across all features
     monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
 
@@ -145,6 +111,7 @@ if selected_months:
 
     # Display the line chart in the Streamlit app
     st.pyplot(plt)
+
 
 
 
