@@ -17,43 +17,28 @@ gdf = gdf.to_crs("EPSG:4326")
 st.subheader("Attribute Table")
 st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
-# Mapping of numerical values to drought severity labels
-drought_severity_map = {
-    0: "Extreme drought",
-    1: "Severe drought",
-    2: "Moderate drought",
-    3: "Mild drought",
-    4: "Normal or above"
-}
-
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
 
-# Sidebar filter for drought severity categories using the numerical values (0-4)
+# Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Severity", ["All"] + list(drought_severity_map.keys())
+    "Filter by Drought Severity", ["All"] + list(gdf["drought_severity"].unique())
 )
-
-# Map the numerical drought filter to the corresponding drought severity label
-if drought_filter != "All":
-    severity_label = drought_severity_map[drought_filter]
-else:
-    severity_label = "All"
 
 # Filter the dataset based on the drought category
 if drought_filter != "All":
-    filtered_gdf = gdf[gdf["drought_severity"] == severity_label]
+    filtered_gdf = gdf[gdf["drought_severity"] == drought_filter]
 else:
     filtered_gdf = gdf
 
 # Sidebar warning message for no data
 if filtered_gdf.empty:
-    st.sidebar.warning(f"No data available for the selected drought severity '{severity_label}'. Please try a different selection.")
+    st.sidebar.warning(f"No data available for the selected drought severity '{drought_filter}'. Please try a different selection.")
 else:
-    st.sidebar.success(f"Displaying data for the selected drought severity '{severity_label}'.")
+    st.sidebar.success(f"Displaying data for the selected drought severity '{drought_filter}'.")
 
 # Display filtered attribute table based on the selected drought severity
-st.subheader(f"Filtered Attribute Table - Drought Severity: {severity_label}")
+st.subheader(f"Filtered Attribute Table - Drought Severity: {drought_filter}")
 st.write(filtered_gdf)
 
 # Create map centered on the centroid of the dataset
@@ -71,11 +56,13 @@ def generate_popup(row):
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Extreme drought": "darkred",
-    "Severe drought": "red",
-    "Moderate drought": "orange",
-    "Mild drought": "yellow",
-    "Normal or above": "green",
+    "Not a drought": "green",
+    "Very Wet": "lightgreen",
+    "Moderately Wet": "yellowgreen",
+    "Near Normal": "yellow",
+    "Moderately Dry": "orange",
+    "Severely Dry": "red",
+    "Extremely Dry": "darkred",
 }
 
 def get_style_function(feature):
