@@ -33,23 +33,16 @@ drought_filter = st.sidebar.selectbox(
     ]
 )
 
-# Categorize drought severity based on SPI values
-def categorize_drought(severity_column):
-    conditions = [
-        (severity_column < -2, "Extreme drought"),
-        ((severity_column >= -2) & (severity_column < -1.5), "Severe drought"),
-        ((severity_column >= -1.5) & (severity_column < -1), "Moderate drought"),
-        ((severity_column >= -1) & (severity_column < 0), "Mild drought"),
-        (severity_column >= 0, "Normal or above")
-    ]
-    
-    # Apply conditions to create a new column for drought severity
-    drought_severity = pd.cut(severity_column, bins=[-float('inf'), -2, -1.5, -1, 0, float('inf')], 
-                              labels=["Extreme drought", "Severe drought", "Moderate drought", "Mild drought", "Normal or above"])
-    return drought_severity
+# Map numeric values to drought severity categories
+drought_severity_mapping = {
+    1: "Extreme drought",
+    2: "Severe drought",
+    3: "Moderate drought",
+    4: "Mild drought",
+}
 
-# Apply drought severity categorization
-gdf["drought severity"] = categorize_drought(gdf["drought severity"])  # Correct column name
+# Apply drought severity mapping
+gdf["drought severity"] = gdf["drought severity"].map(drought_severity_mapping)
 
 # Filter the dataset based on the drought category
 if drought_filter != "All":
