@@ -3,7 +3,6 @@ import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Define dataset paths
 data_file = "data/SPI-J.geojson"  # Replace with the correct path to your GeoJSON file
@@ -24,8 +23,33 @@ show_all_layers = st.sidebar.checkbox("Show All Layers")
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Category", ["All"] + list(gdf["drought_severity"].unique())
+    "Filter by Drought Category", [
+        "All",
+        "Extreme drought",
+        "Severe drought",
+        "Moderate drought",
+        "Mild drought",
+        "Normal or above"
+    ]
 )
+
+# Categorize drought severity based on SPI values
+def categorize_drought(severity_column):
+    conditions = [
+        (severity_column < -2, "Extreme drought"),
+        ((severity_column >= -2) & (severity_column < -1.5), "Severe drought"),
+        ((severity_column >= -1.5) & (severity_column < -1), "Moderate drought"),
+        ((severity_column >= -1) & (severity_column < 0), "Mild drought"),
+        (severity_column >= 0, "Normal or above")
+    ]
+    
+    # Apply conditions to create a new column for drought severity
+    drought_severity = pd.cut(severity_column, bins=[-float('inf'), -2, -1.5, -1, 0, float('inf')], 
+                              labels=["Extreme drought", "Severe drought", "Moderate drought", "Mild drought", "Normal or above"])
+    return drought_severity
+
+# Apply drought severity categorization
+gdf["drought_severity"] = categorize_drought(gdf["SPI_value_column"])  # Replace 'SPI_value_column' with your actual column for SPI
 
 # Filter the dataset based on the drought category
 if drought_filter != "All":
@@ -54,13 +78,11 @@ def generate_popup(row):
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Not a drought": "green",
-    "Very Wet": "lightgreen",
-    "Moderately Wet": "yellowgreen",
-    "Near Normal": "yellow",
-    "Moderately Dry": "orange",
-    "Severely Dry": "red",
-    "Extremely Dry": "darkred",
+    "Extreme drought": "darkred",
+    "Severe drought": "red",
+    "Moderate drought": "orange",
+    "Mild drought": "yellow",
+    "Normal or above": "green",
 }
 
 def get_style_function(feature):
@@ -95,22 +117,6 @@ folium.LayerControl().add_to(m)
 # Display the map
 st_folium(m, width=700, height=500)
 
-# Calculate monthly SPI averages over selected months
-if drought_filter != "All":
-    # Compute mean SPI for each month across all features
-    monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
-
-    # Create a line chart for the selected months
-    plt.figure(figsize=(10, 6))
-    plt.plot(monthly_avg_spi.index, monthly_avg_spi, marker='o', color='b', linestyle='-', linewidth=2)
-    plt.title('Average SPI Over Time (Selected Months)')
-    plt.xlabel('Month')
-    plt.ylabel('Average SPI')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Display the line chart in the Streamlit app
-    st.pyplot(plt)
 
 
 
