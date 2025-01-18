@@ -2,13 +2,16 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
-import matplotlib.pyplot as plt
 
 # Define dataset path
 data_file = "data/SPIi (2).geojson"  # Replace with the correct path to your GeoJSON file
 
 # Load the dataset
-gdf = gpd.read_file(data_file)
+try:
+    gdf = gpd.read_file(data_file)
+except Exception as e:
+    st.error(f"Error loading data file: {e}")
+    st.stop()
 
 # Reproject to EPSG:4326 to handle geometry CRS warnings
 gdf = gdf.to_crs("EPSG:4326")
@@ -39,6 +42,10 @@ def classify_drought_severity(spi_value):
     return "Unknown"  # In case no category matches
 
 # Apply drought severity classification based on the SPI value (assume SPI column is named 'SPI')
+if "SPI" not in gdf.columns:
+    st.error("The GeoJSON file does not contain a 'SPI' column. Please ensure the data file is correctly formatted.")
+    st.stop()
+
 gdf["drought_severity"] = gdf["SPI"].apply(classify_drought_severity)
 
 # Sidebar filter for drought severity categories
@@ -55,6 +62,7 @@ else:
 # Sidebar warning message for no data
 if filtered_gdf.empty:
     st.sidebar.warning(f"No data available for the selected drought category '{drought_filter}'. Please try a different selection.")
+    st.stop()
 else:
     st.sidebar.success(f"Displaying data for the selected drought category '{drought_filter}'.")
 
@@ -114,6 +122,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
