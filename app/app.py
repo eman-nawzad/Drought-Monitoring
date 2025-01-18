@@ -3,7 +3,6 @@ import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Define dataset paths
 data_file = "data/SPI-J.geojson"  # Replace with the correct path to your GeoJSON file
@@ -94,6 +93,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
