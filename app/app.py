@@ -17,12 +17,24 @@ gdf = gdf.to_crs("EPSG:4326")
 st.subheader("Attribute Table")
 st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
+# Map the numerical values or existing labels to the custom drought severity labels
+drought_severity_map = {
+    0: "Extreme drought",
+    1: "Severe drought",
+    2: "Moderate drought",
+    3: "Mild drought",
+    4: "Normal or above"
+}
+
+# Apply the mapping to the drought_severity column
+gdf["drought_severity"] = gdf["drought_severity"].map(drought_severity_map)
+
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Severity", ["All"] + list(gdf["drought_severity"].unique())
+    "Filter by Drought Severity", ["All"] + list(drought_severity_map.values())
 )
 
 # Filter the dataset based on the drought category
@@ -56,13 +68,11 @@ def generate_popup(row):
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Not a drought": "green",
-    "Very Wet": "lightgreen",
-    "Moderately Wet": "yellowgreen",
-    "Near Normal": "yellow",
-    "Moderately Dry": "orange",
-    "Severely Dry": "red",
-    "Extremely Dry": "darkred",
+    "Extreme drought": "darkred",
+    "Severe drought": "red",
+    "Moderate drought": "orange",
+    "Mild drought": "yellow",
+    "Normal or above": "green",
 }
 
 def get_style_function(feature):
@@ -96,7 +106,6 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
-
 
 
 
