@@ -24,13 +24,11 @@ show_all_layers = st.sidebar.checkbox("Show All Layers")
 
 # Define SPI range categories and corresponding drought severity
 spi_categories = {
-    "Not a drought": {"min": 2.00, "max": float("inf")},
-    "Very Wet": {"min": 1.50, "max": 1.99},
-    "Moderately Wet": {"min": 1.00, "max": 1.49},
-    "Near Normal": {"min": -0.99, "max": 0.99},
-    "Moderately Dry": {"min": -1.00, "max": -1.49},
-    "Severely Dry": {"min": -1.50, "max": -1.99},
-    "Extremely Dry": {"min": float("-inf"), "max": -2.00},
+    "Extreme drought": {"min": float("-inf"), "max": -2.00},
+    "Severe drought": {"min": -2.00, "max": -1.50},
+    "Moderate drought": {"min": -1.50, "max": -1.00},
+    "Mild drought": {"min": -1.00, "max": 0.00},
+    "Normal or Above": {"min": 0.00, "max": float("inf")},
 }
 
 # Function to classify drought severity based on SPI
@@ -92,13 +90,11 @@ def generate_popup(row):
 
 # Function to set color based on drought severity
 drought_severity_colors = {
-    "Not a drought": "green",
-    "Very Wet": "lightgreen",
-    "Moderately Wet": "yellowgreen",
-    "Near Normal": "yellow",
-    "Moderately Dry": "orange",
-    "Severely Dry": "red",
-    "Extremely Dry": "darkred",
+    "Extreme drought": "darkred",
+    "Severe drought": "red",
+    "Moderate drought": "orange",
+    "Mild drought": "yellow",
+    "Normal or Above": "green",
 }
 
 def get_style_function(feature):
@@ -149,7 +145,6 @@ if selected_months:
 
     # Display the line chart in the Streamlit app
     st.pyplot(plt)
-
 
 
 
