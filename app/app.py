@@ -49,11 +49,11 @@ def categorize_drought(severity_column):
     return drought_severity
 
 # Apply drought severity categorization
-gdf["drought_severity"] = categorize_drought(gdf["SPI_value_column"])  # Replace 'SPI_value_column' with your actual column for SPI
+gdf["drought severity"] = categorize_drought(gdf["drought severity"])  # Correct column name
 
 # Filter the dataset based on the drought category
 if drought_filter != "All":
-    filtered_gdf = gdf[gdf["drought_severity"] == drought_filter]
+    filtered_gdf = gdf[gdf["drought severity"] == drought_filter]
 else:
     filtered_gdf = gdf
 
@@ -72,7 +72,7 @@ m = folium.Map(location=[avg_lat, avg_lon], zoom_start=12)
 # Function to generate popups with drought severity
 def generate_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
-    severity_class = row["drought_severity"]
+    severity_class = row["drought severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
     return popup_content
 
@@ -86,7 +86,7 @@ drought_severity_colors = {
 }
 
 def get_style_function(feature):
-    severity = feature['properties']['drought_severity']
+    severity = feature['properties']['drought severity']
     color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
     return {"color": color, "weight": 1, "fillOpacity": 0.6}
 
