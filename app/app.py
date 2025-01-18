@@ -2,10 +2,9 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
-import pandas as pd
 import matplotlib.pyplot as plt
 
-# Define dataset paths
+# Define dataset path
 data_file = "data/SPIi (2).geojson"  # Replace with the correct path to your GeoJSON file
 
 # Load the dataset
@@ -20,7 +19,6 @@ st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
-show_all_layers = st.sidebar.checkbox("Show All Layers")
 
 # Define SPI range categories and corresponding drought severity
 spi_categories = {
@@ -40,24 +38,8 @@ def classify_drought_severity(spi_value):
             return category
     return "Unknown"  # In case no category matches
 
-# Allow users to select months
-month_columns = [
-    col for col in gdf.columns
-    if col.lower() in ["january", "february", "march", "april", "may", "june", 
-                       "july", "august", "september", "october", "november", "december"]
-]
-
-# Sidebar for selecting months
-selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
-
-# Ensure the selected_months list is not empty before computing the average
-if selected_months:
-    gdf["selected_months_avg"] = gdf[selected_months].mean(axis=1)
-else:
-    gdf["selected_months_avg"] = 0
-
-# Apply drought severity classification based on selected months average
-gdf["drought_severity"] = gdf["selected_months_avg"].apply(classify_drought_severity)
+# Apply drought severity classification based on the SPI value (assume SPI column is named 'SPI')
+gdf["drought_severity"] = gdf["SPI"].apply(classify_drought_severity)
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
@@ -87,7 +69,7 @@ def generate_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
     severity_class = row["drought_severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
-    popup_content += f"<b>Average SPI (Selected Months):</b> {row['selected_months_avg']:.2f}<br>"
+    popup_content += f"<b>SPI:</b> {row['SPI']:.2f}<br>"
     return popup_content
 
 # Function to set color based on drought severity
@@ -132,24 +114,6 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
-
-# Calculate monthly SPI averages over selected months
-if selected_months:
-    # Compute mean SPI for each month across all features
-    monthly_avg_spi = filtered_gdf[selected_months].mean(axis=0)
-
-    # Create a line chart for the selected months
-    plt.figure(figsize=(10, 6))
-    plt.plot(monthly_avg_spi.index, monthly_avg_spi, marker='o', color='b', linestyle='-', linewidth=2)
-    plt.title('Average SPI Over Time (Selected Months)')
-    plt.xlabel('Month')
-    plt.ylabel('Average SPI')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
-
-    # Display the line chart in the Streamlit app
-    st.pyplot(plt)
-
 
 
 
