@@ -15,7 +15,7 @@ gdf = gdf.to_crs("EPSG:4326")
 # Sidebar navigation
 page = st.sidebar.radio("Select a page:", ("SPI", "SPI Drought Severity Map"))
 
-if page == "SPI ":
+if page == "SPI Information":
     # Information about SPI
     st.sidebar.title("SPI Information")
     st.sidebar.markdown("""
