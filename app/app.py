@@ -16,7 +16,8 @@ gdf = gdf.to_crs("EPSG:4326")
 
 # Sidebar
 st.sidebar.title("SPI Drought Severity Map Viewer")
-show_all_layers = st.sidebar.checkbox("Show All Layers")
+st.sidebar.markdown("This data represents drought severity for Erbil in 2023.")
+st.sidebar.markdown("You can find more information about SPI [here](https://www.example.com).")  # Add your link here
 
 # Define SPI range categories and corresponding drought severity
 spi_categories = {
@@ -131,8 +132,18 @@ if drought_filter != "All" and not filtered_gdf.empty:
 folium.LayerControl().add_to(m)
 
 # Display the map
+st.title("SPI Drought Severity Analysis for Erbil - 2023")
+st.markdown("This map shows the drought severity across Erbil for 2023, based on the Standardized Precipitation Index (SPI).")
+
+# Display the map
 st_folium(m, width=700, height=500)
 
+# Add a page with information about SPI
+st.sidebar.title("SPI Information")
+st.sidebar.markdown("""
+The Standardized Precipitation Index (SPI) is a tool used to quantify the precipitation deficit or surplus for a particular location over a given time period. It is a widely used index for monitoring droughts and can help understand how dry or wet a region is. 
+For more detailed information on SPI, you can check the [Wikipedia page](https://en.wikipedia.org/wiki/Standardized_precipitation_index).
+""")
 
 
 
