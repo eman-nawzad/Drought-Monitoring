@@ -17,7 +17,7 @@ page = st.sidebar.radio("Select a page:", ("SPI", "SPI Drought Severity Map"))
 
 if page == "SPI ":
     # Information about SPI
-    st.sidebar.title("SPI ")
+    st.sidebar.title("SPI Information")
     st.sidebar.markdown("""
     The Standardized Precipitation Index (SPI) is a tool used to quantify the precipitation deficit or surplus for a particular location over a given time period. 
     It is a widely used index for monitoring droughts and can help understand how dry or wet a region is.
