@@ -29,13 +29,8 @@ if page == "SPI ":
     The Standardized Precipitation Index (SPI) for drought monitoring is calculated using accumulated precipitation over a 12-month period, relative to the long-term average for that period. 
     This SPI helps identify the severity of drought or wet conditions over the past year. 
 
-    ### Steps for calculating the 12-month SPI:
     
-    1. **Accumulated Precipitation (sum):**
-        - First, calculate the total precipitation for the last 12 months.
-        - This is the sum of monthly precipitation values over the 12-month period.
-        
-    2. **Standardization:**
+    **SPI Formula **
         - Calculate the long-term mean and standard deviation for the same period (12 months) based on historical data.
         - Then, standardize the 12-month precipitation data by comparing the accumulated precipitation value to the long-term average using the formula:
           \[
@@ -46,11 +41,21 @@ if page == "SPI ":
           - \( \mu \) is the long-term mean precipitation for the same period
           - \( \sigma \) is the standard deviation of precipitation for the same period
 
-    3. **Interpretation of SPI values:**
+     **Interpretation of SPI values:**
         - A more extreme SPI value (either positive or negative) indicates more extreme wet or dry conditions.
         - **SPI ≥ +2.0:** Extremely wet conditions
         - **SPI ≤ -2.0:** Extremely dry conditions
         - Intermediate values can indicate varying levels of wet or dry conditions.
+
+
+
+        ### Seasonal Breakdown:
+    The SPI can also be analyzed on a seasonal basis. The following seasons are commonly used for understanding precipitation patterns:
+
+    - **Spring:** March, April, May
+    - **Summer:** June, July, August
+    - **Autumn (Fall):** September, October, November
+    - **Winter:** December, January, February
 
     This approach allows you to evaluate drought or wet conditions over a 12-month period relative to the long-term average, which helps in effective drought monitoring and assessment.
     """)
