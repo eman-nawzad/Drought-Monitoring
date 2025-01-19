@@ -16,7 +16,7 @@ gdf = gdf.to_crs("EPSG:4326")
 page = st.sidebar.radio("Select a page:", ("SPI ", "SPI Drought Severity Map"))
 
 if page == "SPI ":
-    #  SPI
+    # SPI
     st.sidebar.title("SPI ")
     st.sidebar.markdown("""
     The Standardized Precipitation Index (SPI) is a tool used to quantify the precipitation deficit or surplus for a particular location over a given time period. 
@@ -178,6 +178,7 @@ elif page == "SPI Drought Severity Map":
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
