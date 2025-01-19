@@ -18,20 +18,20 @@ lst_gdf = lst_gdf.to_crs("EPSG:4326")
 # Perform spatial join to combine SPI and LST data
 combined_gdf = gpd.sjoin(spi_gdf, lst_gdf, how="inner", predicate="intersects")
 
-# Add a combined metric for analysis (e.g., SPI and LST interaction)
-combined_gdf["combined_metric"] = combined_gdf["SPI_value"] * combined_gdf["LST_value"]
+# Add a combined metric for analysis (e.g., drought severity and LST interaction)
+combined_gdf["combined_metric"] = combined_gdf["drought_severity"] * combined_gdf["LST_value"]
 
 # Sidebar for user selection
 st.sidebar.title("Drought and Surface Temperature Map Viewer")
 metric = st.sidebar.selectbox(
     "Select metric to display:",
-    ["SPI", "LST", "Combined Metric"],
+    ["Drought Severity", "LST", "Combined Metric"],
 )
 
 # Filter combined_gdf based on the selected metric
-if metric == "SPI":
-    combined_gdf["display_metric"] = combined_gdf["SPI_value"]
-    legend_title = "SPI Value"
+if metric == "Drought Severity":
+    combined_gdf["display_metric"] = combined_gdf["drought_severity"]
+    legend_title = "Drought Severity"
 elif metric == "LST":
     combined_gdf["display_metric"] = combined_gdf["LST_value"]
     legend_title = "LST Value"
@@ -74,8 +74,8 @@ folium.GeoJson(
     combined_gdf,
     style_function=style_function,
     tooltip=folium.GeoJsonTooltip(
-        fields=["SPI_value", "LST_value", "combined_metric"],
-        aliases=["SPI:", "LST:", "Combined:"],
+        fields=["drought_severity", "LST_value", "combined_metric"],
+        aliases=["Drought Severity:", "LST:", "Combined Metric:"],
     ),
 ).add_to(m)
 
@@ -84,7 +84,8 @@ st_folium(m, width=700, height=500)
 
 # Display the filtered attribute table
 st.subheader("Filtered Attribute Table")
-st.dataframe(combined_gdf[["SPI_value", "LST_value", "combined_metric"]])
+st.dataframe(combined_gdf[["drought_severity", "LST_value", "combined_metric"]])
+
 
 
 
