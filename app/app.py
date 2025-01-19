@@ -2,8 +2,6 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
-import pandas as pd
-import matplotlib.pyplot as plt
 
 # Define dataset paths
 data_file = "data/SPIi (2).geojson"  # Replace with the correct path to your GeoJSON file
@@ -26,12 +24,35 @@ if page == "SPI Information":
     """)
     
     # Display message for SPI information page
-    st.title("SPI Information for Drought Monitoring")
+    st.title("12-Month SPI Calculation for Drought Monitoring")
     st.markdown("""
-    The SPI is widely used for monitoring droughts based on precipitation data. It provides a standardized index, which helps to identify drought conditions over time. 
-    The SPI is useful for assessing different drought severity levels and aids in better understanding the changing climate patterns.
-    The SPI ranges from positive values indicating wet conditions to negative values indicating dry conditions. A positive SPI value signifies a surplus of precipitation, 
-    while a negative SPI value indicates a precipitation deficit, with the more negative the value, the more severe the drought.
+    The Standardized Precipitation Index (SPI) for drought monitoring is calculated using accumulated precipitation over a 12-month period, relative to the long-term average for that period. 
+    This SPI helps identify the severity of drought or wet conditions over the past year. 
+
+    ### Steps for calculating the 12-month SPI:
+    
+    1. **Accumulated Precipitation (sum):**
+        - First, calculate the total precipitation for the last 12 months.
+        - This is the sum of monthly precipitation values over the 12-month period.
+        
+    2. **Standardization:**
+        - Calculate the long-term mean and standard deviation for the same period (12 months) based on historical data.
+        - Then, standardize the 12-month precipitation data by comparing the accumulated precipitation value to the long-term average using the formula:
+          \[
+          \text{SPI} = \frac{P - \mu}{\sigma}
+          \]
+          where:
+          - \( P \) is the total precipitation for the 12-month period
+          - \( \mu \) is the long-term mean precipitation for the same period
+          - \( \sigma \) is the standard deviation of precipitation for the same period
+
+    3. **Interpretation of SPI values:**
+        - A more extreme SPI value (either positive or negative) indicates more extreme wet or dry conditions.
+        - **SPI ≥ +2.0:** Extremely wet conditions
+        - **SPI ≤ -2.0:** Extremely dry conditions
+        - Intermediate values can indicate varying levels of wet or dry conditions.
+
+    This approach allows you to evaluate drought or wet conditions over a 12-month period relative to the long-term average, which helps in effective drought monitoring and assessment.
     """)
     
 elif page == "SPI Drought Severity Map":
@@ -157,6 +178,7 @@ elif page == "SPI Drought Severity Map":
 
     # Display the map
     st_folium(m, width=700, height=500)
+
 
 
 
