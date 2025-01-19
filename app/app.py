@@ -55,9 +55,9 @@ if page == "SPI ":
     This approach allows you to evaluate drought or wet conditions over a 12-month period relative to the long-term average, which helps in effective drought monitoring and assessment.
     """)
     
-elif page == "SPI Drought Severity Map":
+elif page == " Drought Severity Map":
     # Main content for SPI map
-    st.sidebar.title("SPI Drought Severity Map")
+    st.sidebar.title(" Drought Severity Map")
     st.sidebar.markdown("This data represents drought severity for Erbil in 2023.")
 
     # Define SPI range categories and corresponding drought severity
