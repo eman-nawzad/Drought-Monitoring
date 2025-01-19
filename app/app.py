@@ -23,42 +23,55 @@ if page == "SPI ":
     It is a widely used index for monitoring droughts and can help understand how dry or wet a region is.
     """)
     
-    # Display message for SPI information page
-    st.title("12-Month SPI Calculation for Drought Monitoring")
-    st.markdown("""
-    The Standardized Precipitation Index (SPI) for drought monitoring is calculated using accumulated precipitation over a 12-month period, relative to the long-term average for that period. 
-    This SPI helps identify the severity of drought or wet conditions over the past year. 
+# Display message for SPI information page
+st.title("12-Month SPI Calculation for Drought Monitoring")
 
-    
-    **SPI Formula **
-        - Calculate the long-term mean and standard deviation for the same period (12 months) based on historical data.
-        - Then, standardize the 12-month precipitation data by comparing the accumulated precipitation value to the long-term average using the formula:
-          \[
-          \text{SPI} = \frac{P - \mu}{\sigma}
-          \]
-          where:
-          - \( P \) is the total precipitation for the 12-month period
-          - \( \mu \) is the long-term mean precipitation for the same period
-          - \( \sigma \) is the standard deviation of precipitation for the same period
+st.markdown("""
+The **Standardized Precipitation Index (SPI)** is used for drought monitoring by quantifying the deviation in precipitation over a 12-month period, relative to the long-term average for the same period. The SPI helps identify the severity of drought or wet conditions over time.
 
-     **Interpretation of SPI values:**
-        - A more extreme SPI value (either positive or negative) indicates more extreme wet or dry conditions.
-        - **SPI ≥ +2.0:** Extremely wet conditions
-        - **SPI ≤ -2.0:** Extremely dry conditions
-        - Intermediate values can indicate varying levels of wet or dry conditions.
+### **How is SPI Calculated?**
 
+1. **Accumulated Precipitation:**
+   - First, calculate the total precipitation for the last 12 months.
+   - This is the sum of monthly precipitation values over the 12-month period.
 
+2. **Standardization:**
+   - Calculate the long-term mean and standard deviation for the same 12-month period based on historical data.
+   - Standardize the 12-month precipitation data using the following formula:
 
-        ### Seasonal Breakdown:
-    The SPI can also be analyzed on a seasonal basis. The following seasons are commonly used for understanding precipitation patterns:
+   \[
+   \text{SPI} = \frac{P - \mu}{\sigma}
+   \]
 
-    - **Spring:** March, April, May
-    - **Summer:** June, July, August
-    - **Autumn (Fall):** September, October, November
-    - **Winter:** December, January, February
+   where:
+   - \( P \) is the total precipitation for the 12-month period
+   - \( \mu \) is the long-term mean precipitation for the same period
+   - \( \sigma \) is the standard deviation of precipitation for the same period
 
-    This approach allows you to evaluate drought or wet conditions over a 12-month period relative to the long-term average, which helps in effective drought monitoring and assessment.
-    """)
+### **Interpretation of SPI Values:**
+
+- **SPI ≥ +2.0:** Extremely wet conditions
+- **SPI ≤ -2.0:** Extremely dry conditions
+- **Intermediate Values:**
+  - A more extreme SPI value (either positive or negative) indicates more extreme wet or dry conditions.
+  - Intermediate values represent varying levels of wet or dry conditions, such as:
+    - **-1.50 to -1.99:** Severe drought
+    - **-1.00 to -1.49:** Moderate drought
+    - **-0.99 to 0.00:** Mild drought
+    - **+1.00 to +1.49:** Moderate wet conditions
+
+### **Seasonal Breakdown for SPI:**
+
+The SPI can also be analyzed on a seasonal basis to better understand precipitation patterns throughout the year. The following seasons are commonly used:
+
+- **Spring:** March, April, May
+- **Summer:** June, July, August
+- **Autumn (Fall):** September, October, November
+- **Winter:** December, January, February
+
+By analyzing SPI for different seasons, you can more effectively monitor and assess drought conditions or wet spells throughout the year.
+""")
+
     
 elif page == " Drought Severity Map":
     # Main content for SPI map
