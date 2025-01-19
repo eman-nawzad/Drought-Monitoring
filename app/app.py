@@ -6,7 +6,10 @@ import streamlit as st
 lst_gdf = gpd.read_file('data/LST.geojson')  # Update path to LST GeoJSON
 spi_gdf = gpd.read_file('data/SPI-J.geojson')  # Update path to SPI GeoJSON
 
-# Get the centroid of the LST GeoDataFrame to center the map
+# Reproject to a projected CRS (e.g., UTM zone 33N for global data)
+lst_gdf = lst_gdf.to_crs('EPSG:3395')  # Change to an appropriate projected CRS
+
+# Get the centroid of the LST GeoDataFrame (after reprojecting to UTM)
 latitude = lst_gdf.geometry.centroid.y.mean()
 longitude = lst_gdf.geometry.centroid.x.mean()
 
@@ -17,7 +20,8 @@ m = folium.Map(location=[latitude, longitude], zoom_start=10)
 for _, row in lst_gdf.iterrows():
     folium.GeoJson(row['geometry']).add_to(m)
 
-# Add SPI data to the map
+# Reproject SPI data and add to the map
+spi_gdf = spi_gdf.to_crs('EPSG:3395')  # Ensure both datasets are in the same CRS
 for _, row in spi_gdf.iterrows():
     folium.GeoJson(row['geometry']).add_to(m)
 
@@ -29,8 +33,6 @@ m.save(map_path)
 st.title("Drought Monitoring Map")
 st.write("This map shows the LST and SPI data for drought monitoring.")
 st.markdown(f'<iframe src="{map_path}" width="100%" height="600"></iframe>', unsafe_allow_html=True)
-
-
 
 
 
