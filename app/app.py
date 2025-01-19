@@ -8,7 +8,7 @@ import json
 
 # Define dataset paths for SPI and LST
 spi_file = "data/SPI-J.geojson"  # SPI GeoJSON file path
-lst_file = "data/LST-geojson.geojson"  # MODIS LST GeoJSON file path
+lst_file = "data/LST.geojson"  # MODIS LST GeoJSON file path
 
 # Load SPI dataset (already in GeoJSON format)
 spi_gdf = gpd.read_file(spi_file)
