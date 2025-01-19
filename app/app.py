@@ -104,7 +104,35 @@ drought_severity_colors = {
 def get_style_function(feature):
     severity = feature['properties']['drought_severity']
     color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
-    return {"color": color, "weight": 1, "
+    return {"color": color, "weight": 1, "fillOpacity": 0.6}
+
+# Add GeoJSON layer with popups and colors
+def add_geojson_layer(gdf, map_obj):
+    geo_json = folium.GeoJson(
+        gdf,
+        style_function=get_style_function,
+        name="SPI Drought Severity"  # Set the name for LayerControl
+    )
+    for _, row in gdf.iterrows():
+        popup = folium.Popup(generate_popup(row), max_width=300)
+        geo_json.add_child(popup)
+    geo_json.add_to(map_obj)
+
+# Add the filtered GeoJSON layer
+add_geojson_layer(filtered_gdf, m)
+
+# Adjust the map view to the bounding box of the selected class
+if drought_filter != "All" and not filtered_gdf.empty:
+    # Get the bounding box of the selected class
+    bounds = filtered_gdf.geometry.total_bounds  # [minx, miny, maxx, maxy]
+    # Zoom to the bounding box
+    m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+
+folium.LayerControl().add_to(m)
+
+# Display the map
+st_folium(m, width=700, height=500)
+
 
 
 
