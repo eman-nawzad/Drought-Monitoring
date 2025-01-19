@@ -3,21 +3,29 @@ import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
 import pandas as pd
+import requests
+import json
 
-# Define dataset paths
-data_file = "data/SPI-J.geojson"  # Replace with the correct path to your GeoJSON file
+# Define dataset paths for SPI and LST
+spi_file = "data/SPI-J.geojson"  # SPI GeoJSON file path
+lst_file = "data/LST-geojson.geojson"  # MODIS LST GeoJSON file path
 
-# Load the dataset
-gdf = gpd.read_file(data_file)
+# Load SPI dataset (already in GeoJSON format)
+spi_gdf = gpd.read_file(spi_file)
+spi_gdf = spi_gdf.to_crs("EPSG:4326")  # Ensure the CRS is in EPSG:4326 for mapping
 
-# Reproject to EPSG:4326 to handle geometry CRS warnings
-gdf = gdf.to_crs("EPSG:4326")
+# Load LST dataset (assuming it is in GeoJSON format as well)
+lst_gdf = gpd.read_file(lst_file)
+lst_gdf = lst_gdf.to_crs("EPSG:4326")  # Ensure the CRS is in EPSG:4326 for mapping
 
-# Display the full attribute table
-st.subheader("Attribute Table")
-st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
+# Display the SPI and LST DataTables
+st.subheader("SPI Data Attribute Table")
+st.write(spi_gdf)  # Display the SPI GeoDataFrame
 
-# Map the numerical values or existing labels to the custom drought severity labels
+st.subheader("MODIS LST Data Attribute Table")
+st.write(lst_gdf)  # Display the LST GeoDataFrame
+
+# Map the numerical values or existing labels to the custom drought severity labels for SPI
 drought_severity_map = {
     0: "Extreme drought",
     1: "Severe drought",
@@ -27,81 +35,92 @@ drought_severity_map = {
 }
 
 # Apply the mapping to the drought_severity column
-gdf["drought_severity"] = gdf["drought_severity"].map(drought_severity_map)
+spi_gdf["drought_severity"] = spi_gdf["drought_severity"].map(drought_severity_map)
 
-# Sidebar
-st.sidebar.title("SPI Drought Severity Map Viewer")
+# Sidebar for SPI and LST data visualization
+st.sidebar.title("Drought and Temperature Viewer")
 
-# Sidebar filter for drought severity categories
+# Sidebar for SPI severity selection
 drought_filter = st.sidebar.selectbox(
     "Filter by Drought Severity", ["All"] + list(drought_severity_map.values())
 )
 
-# Filter the dataset based on the drought category
+# Filter the SPI dataset based on the drought severity
 if drought_filter != "All":
-    filtered_gdf = gdf[gdf["drought_severity"] == drought_filter]
+    filtered_spi_gdf = spi_gdf[spi_gdf["drought_severity"] == drought_filter]
 else:
-    filtered_gdf = gdf
+    filtered_spi_gdf = spi_gdf
 
 # Sidebar warning message for no data
-if filtered_gdf.empty:
+if filtered_spi_gdf.empty:
     st.sidebar.warning(f"No data available for the selected drought severity '{drought_filter}'. Please try a different selection.")
 else:
     st.sidebar.success(f"Displaying data for the selected drought severity '{drought_filter}'.")
 
-# Display filtered attribute table based on the selected drought severity
-st.subheader(f"Filtered Attribute Table - Drought Severity: {drought_filter}")
-st.write(filtered_gdf)
+# Display filtered SPI attribute table
+st.subheader(f"Filtered SPI Attribute Table - Drought Severity: {drought_filter}")
+st.write(filtered_spi_gdf)
 
-# Create map centered on the centroid of the dataset
-centroid = filtered_gdf.geometry.centroid
-avg_lat = centroid.y.mean()
-avg_lon = centroid.x.mean()
-m = folium.Map(location=[avg_lat, avg_lon], zoom_start=12)
+# Create map centered on the centroid of the SPI dataset
+centroid_spi = filtered_spi_gdf.geometry.centroid
+avg_lat_spi = centroid_spi.y.mean()
+avg_lon_spi = centroid_spi.x.mean()
 
-# Function to generate popups with drought severity
-def generate_popup(row):
+# Create the map
+m = folium.Map(location=[avg_lat_spi, avg_lon_spi], zoom_start=8)
+
+# Function to generate popups with SPI drought severity
+def generate_spi_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
     severity_class = row["drought_severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
     return popup_content
 
-# Updated color palette with more distinct and vibrant colors
-drought_severity_colors = {
-    "Extreme drought": "#8B0000",  # Dark Red
-    "Severe drought": "#FF4500",  # Orange Red
-    "Moderate drought": "#FFA500",  # Orange
-    "Mild drought": "#FFD700",  # Gold
-    "Normal or above": "#90EE90",  # Light Green
-}
+# Function to generate popups with LST temperature information
+def generate_lst_popup(row):
+    popup_content = f"<strong>Feature Information</strong><br>"
+    lst_value = row["LST"]  # Assuming the LST data has a "LST" column
+    popup_content += f"<b>Surface Temperature (°C):</b> {lst_value}<br>"
+    return popup_content
 
-def get_style_function(feature):
-    severity = feature['properties']['drought_severity']
-    color = drought_severity_colors.get(severity, "gray")  # Default to gray if no matching class
-    return {"color": color, "weight": 1, "fillOpacity": 0.6}
-
-# Add GeoJSON layer with popups and colors
-def add_geojson_layer(gdf, map_obj):
+# Add SPI GeoJSON layer with popups and colors
+def add_spi_geojson_layer(spi_gdf, map_obj):
     geo_json = folium.GeoJson(
-        gdf,
-        style_function=get_style_function,
-        name="SPI Drought Severity"  # Set the name for LayerControl
+        spi_gdf,
+        style_function=lambda feature: {
+            "color": "#FF4500", "weight": 1, "fillOpacity": 0.6
+        },
+        name="SPI Drought Severity"
     )
-    for _, row in gdf.iterrows():
-        popup = folium.Popup(generate_popup(row), max_width=300)
+    for _, row in spi_gdf.iterrows():
+        popup = folium.Popup(generate_spi_popup(row), max_width=300)
         geo_json.add_child(popup)
     geo_json.add_to(map_obj)
 
-# Add the filtered GeoJSON layer
-add_geojson_layer(filtered_gdf, m)
+# Add LST GeoJSON layer with popups and colors
+def add_lst_geojson_layer(lst_gdf, map_obj):
+    geo_json = folium.GeoJson(
+        lst_gdf,
+        style_function=lambda feature: {
+            "color": "#FFD700", "weight": 1, "fillOpacity": 0.6
+        },
+        name="MODIS LST Temperature"
+    )
+    for _, row in lst_gdf.iterrows():
+        popup = folium.Popup(generate_lst_popup(row), max_width=300)
+        geo_json.add_child(popup)
+    geo_json.add_to(map_obj)
 
-# Adjust the map view to the bounding box of the selected class
-if drought_filter != "All" and not filtered_gdf.empty:
-    # Get the bounding box of the selected class
-    bounds = filtered_gdf.geometry.total_bounds  # [minx, miny, maxx, maxy]
-    # Zoom to the bounding box
-    m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+# Add SPI and LST layers to the map
+add_spi_geojson_layer(filtered_spi_gdf, m)
+add_lst_geojson_layer(lst_gdf, m)
 
+# Adjust the map view to fit the bounds of the datasets
+if not filtered_spi_gdf.empty:
+    bounds_spi = filtered_spi_gdf.geometry.total_bounds  # [minx, miny, maxx, maxy]
+    m.fit_bounds([[bounds_spi[1], bounds_spi[0]], [bounds_spi[3], bounds_spi[2]]])
+
+# Add Layer Control
 folium.LayerControl().add_to(m)
 
 # Display the map
