@@ -21,16 +21,19 @@ if page == "SPI Information":
     # Information about SPI
     st.sidebar.title("SPI Information")
     st.sidebar.markdown("""
-    The Standardized Precipitation Index (SPI) is a tool used to quantify the precipitation deficit or surplus for a particular location over a given time period. It is a widely used index for monitoring droughts and can help understand how dry or wet a region is. 
-    For more detailed information on SPI, you can check the [Wikipedia page](https://en.wikipedia.org/wiki/Standardized_precipitation_index).
+    The Standardized Precipitation Index (SPI) is a tool used to quantify the precipitation deficit or surplus for a particular location over a given time period. 
+    It is a widely used index for monitoring droughts and can help understand how dry or wet a region is.
     """)
-
+    
     # Display message for SPI information page
     st.title("SPI Information for Drought Monitoring")
     st.markdown("""
-    The SPI is widely used for monitoring droughts based on precipitation data. It provides a standardized index, which helps to identify drought conditions over time. The SPI is useful for assessing different drought severity levels and aids in better understanding the changing climate patterns.
+    The SPI is widely used for monitoring droughts based on precipitation data. It provides a standardized index, which helps to identify drought conditions over time. 
+    The SPI is useful for assessing different drought severity levels and aids in better understanding the changing climate patterns.
+    The SPI ranges from positive values indicating wet conditions to negative values indicating dry conditions. A positive SPI value signifies a surplus of precipitation, 
+    while a negative SPI value indicates a precipitation deficit, with the more negative the value, the more severe the drought.
     """)
-
+    
 elif page == "SPI Drought Severity Map":
     # Main content for SPI map
     st.sidebar.title("SPI Drought Severity Map")
@@ -154,7 +157,6 @@ elif page == "SPI Drought Severity Map":
 
     # Display the map
     st_folium(m, width=700, height=500)
-
 
 
 
