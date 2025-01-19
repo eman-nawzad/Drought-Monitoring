@@ -173,8 +173,8 @@ elif page == " Drought Severity Map":
     folium.LayerControl().add_to(m)
 
     # Display the map
-    st.title("SPI Drought Severity Analysis for Erbil - 2023")
-    st.markdown("This map shows the drought severity across Erbil for 2023, based on the Standardized Precipitation Index (SPI).")
+    st.title(" Drought Severity Analysis for Erbil - 2023")
+    st.markdown("This map shows the drought severity , based on the Standardized Precipitation Index (SPI).")
 
     # Display the map
     st_folium(m, width=700, height=500)
