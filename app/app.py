@@ -5,7 +5,7 @@ import geopandas as gpd
 import pandas as pd
 
 # Define dataset paths
-spi_data_file = "data/SPI.geojson"  # Replace with the correct path to SPI GeoJSON
+spi_data_file = "data/SPI-J.geojson"  # Replace with the correct path to SPI GeoJSON
 lst_data_file = "data/LST.geojson"  # Replace with the correct path to LST GeoJSON
 
 # Load the datasets
