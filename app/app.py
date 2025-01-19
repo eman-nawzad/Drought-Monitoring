@@ -1,4 +1,3 @@
-
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
@@ -41,15 +40,19 @@ def classify_drought_severity(spi_value):
             return category
     return "Unknown"  # In case no category matches
 
-# Allow users to select months
-month_columns = [
-    col for col in gdf.columns
-    if col.lower() in ["january", "february", "march", "april", "may", "june", 
-                       "july", "august", "september", "october", "november", "december"]
-]
+# Define seasons and their corresponding months
+seasons = {
+    "Spring": ["March", "April", "May"],
+    "Summer": ["June", "July", "August"],
+    "Autumn (Fall)": ["September", "October", "November"],
+    "Winter": ["December", "January", "February"]
+}
 
-# Sidebar for selecting months
-selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
+# Sidebar for selecting seasons
+selected_season = st.sidebar.selectbox("Select Season", list(seasons.keys()))
+
+# Identify the months corresponding to the selected season
+selected_months = seasons[selected_season]
 
 # Ensure the selected_months list is not empty before computing the average
 if selected_months:
@@ -133,6 +136,7 @@ folium.LayerControl().add_to(m)
 
 # Display the map
 st_folium(m, width=700, height=500)
+
 
 
 
