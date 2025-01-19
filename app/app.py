@@ -2,8 +2,8 @@ import folium
 import geopandas as gpd
 
 # Load your GeoJSON files (LST and SPI)
-lst_gdf = gpd.read_file('/path/to/LST.geojson')
-spi_gdf = gpd.read_file('/path/to/SPI-J.geojson')
+lst_gdf = gpd.read_file('/data/LST.geojson')
+spi_gdf = gpd.read_file('/data/SPI-J.geojson')
 
 # Initialize a map centered around a specific latitude and longitude
 m = folium.Map(location=[latitude, longitude], zoom_start=10)
