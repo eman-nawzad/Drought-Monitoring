@@ -13,7 +13,7 @@ gdf = gpd.read_file(data_file)
 gdf = gdf.to_crs("EPSG:4326")
 
 # Sidebar navigation
-page = st.sidebar.radio("Select a page:", ("SPI", "SPI Drought Severity Map"))
+page = st.sidebar.radio("Select a page:", ("SPI Information", "SPI Drought Severity Map"))
 
 if page == "SPI Information":
     # Information about SPI
