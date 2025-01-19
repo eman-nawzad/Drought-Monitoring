@@ -3,10 +3,9 @@ import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
 import pandas as pd
-import matplotlib.pyplot as plt
 
 # Define dataset paths
-data_file = "data/SPIi (2).geojson"  # Replace with the correct path to your GeoJSON file
+data_file = "data/SPI-J.geojson"  # Replace with the correct path to your GeoJSON file
 
 # Load the dataset
 gdf = gpd.read_file(data_file)
@@ -18,50 +17,24 @@ gdf = gdf.to_crs("EPSG:4326")
 st.subheader("Attribute Table")
 st.write(gdf)  # Display the entire GeoDataFrame to inspect column names
 
-# Sidebar
-st.sidebar.title("SPI Drought Severity Map Viewer")
-show_all_layers = st.sidebar.checkbox("Show All Layers")
-
-# Define SPI range categories and corresponding drought severity
-spi_categories = {
-    "Not a drought": {"min": 2.00, "max": float("inf")},
-    "Very Wet": {"min": 1.50, "max": 1.99},
-    "Moderately Wet": {"min": 1.00, "max": 1.49},
-    "Near Normal": {"min": -0.99, "max": 0.99},
-    "Moderately Dry": {"min": -1.00, "max": -1.49},
-    "Severely Dry": {"min": -1.50, "max": -1.99},
-    "Extremely Dry": {"min": float("-inf"), "max": -2.00},
+# Map the numerical values or existing labels to the custom drought severity labels
+drought_severity_map = {
+    0: "Extreme drought",
+    1: "Severe drought",
+    2: "Moderate drought",
+    3: "Mild drought",
+    4: "Normal or above"
 }
 
-# Function to classify drought severity based on SPI
-def classify_drought_severity(spi_value):
-    for category, range_ in spi_categories.items():
-        if range_["min"] <= spi_value <= range_["max"]:
-            return category
-    return "Unknown"  # In case no category matches
+# Apply the mapping to the drought_severity column
+gdf["drought_severity"] = gdf["drought_severity"].map(drought_severity_map)
 
-# Allow users to select months
-month_columns = [
-    col for col in gdf.columns
-    if col.lower() in ["january", "february", "march", "april", "may", "june", 
-                       "july", "august", "september", "october", "november", "december"]
-]
-
-# Sidebar for selecting months
-selected_months = st.sidebar.multiselect("Select Months", month_columns, default=month_columns)
-
-# Ensure the selected_months list is not empty before computing the average
-if selected_months:
-    gdf["selected_months_avg"] = gdf[selected_months].mean(axis=1)
-else:
-    gdf["selected_months_avg"] = 0
-
-# Apply drought severity classification based on selected months average
-gdf["drought_severity"] = gdf["selected_months_avg"].apply(classify_drought_severity)
+# Sidebar
+st.sidebar.title("SPI Drought Severity Map Viewer")
 
 # Sidebar filter for drought severity categories
 drought_filter = st.sidebar.selectbox(
-    "Filter by Drought Category", ["All"] + list(spi_categories.keys())
+    "Filter by Drought Severity", ["All"] + list(drought_severity_map.values())
 )
 
 # Filter the dataset based on the drought category
@@ -72,9 +45,13 @@ else:
 
 # Sidebar warning message for no data
 if filtered_gdf.empty:
-    st.sidebar.warning(f"No data available for the selected drought category '{drought_filter}'. Please try a different selection.")
+    st.sidebar.warning(f"No data available for the selected drought severity '{drought_filter}'. Please try a different selection.")
 else:
-    st.sidebar.success(f"Displaying data for the selected drought category '{drought_filter}'.")
+    st.sidebar.success(f"Displaying data for the selected drought severity '{drought_filter}'.")
+
+# Display filtered attribute table based on the selected drought severity
+st.subheader(f"Filtered Attribute Table - Drought Severity: {drought_filter}")
+st.write(filtered_gdf)
 
 # Create map centered on the centroid of the dataset
 centroid = filtered_gdf.geometry.centroid
@@ -87,18 +64,15 @@ def generate_popup(row):
     popup_content = f"<strong>Feature Information</strong><br>"
     severity_class = row["drought_severity"]
     popup_content += f"<b>Drought Severity:</b> {severity_class}<br>"
-    popup_content += f"<b>Average SPI (Selected Months):</b> {row['selected_months_avg']:.2f}<br>"
     return popup_content
 
-# Function to set color based on drought severity
+# Updated color palette with more distinct and vibrant colors
 drought_severity_colors = {
-    "Not a drought": "green",
-    "Very Wet": "lightgreen",
-    "Moderately Wet": "yellowgreen",
-    "Near Normal": "yellow",
-    "Moderately Dry": "orange",
-    "Severely Dry": "red",
-    "Extremely Dry": "darkred",
+    "Extreme drought": "#8B0000",  # Dark Red
+    "Severe drought": "#FF4500",  # Orange Red
+    "Moderate drought": "#FFA500",  # Orange
+    "Mild drought": "#FFD700",  # Gold
+    "Normal or above": "#90EE90",  # Light Green
 }
 
 def get_style_function(feature):
