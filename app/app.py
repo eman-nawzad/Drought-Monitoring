@@ -1,90 +1,32 @@
-import streamlit as st
 import folium
-from streamlit_folium import st_folium
 import geopandas as gpd
 
-# Define dataset paths
-spi_data_file = "data/SPI-J.geojson"  # Replace with the correct path to SPI GeoJSON
-lst_data_file = "data/LST.geojson"  # Replace with the correct path to LST GeoJSON
+# Load your GeoJSON files (LST and SPI)
+lst_gdf = gpd.read_file('/path/to/LST.geojson')
+spi_gdf = gpd.read_file('/path/to/SPI-J.geojson')
 
-# Load the datasets
-spi_gdf = gpd.read_file(spi_data_file)
-lst_gdf = gpd.read_file(lst_data_file)
+# Initialize a map centered around a specific latitude and longitude
+m = folium.Map(location=[latitude, longitude], zoom_start=10)
 
-# Ensure both datasets are in the same CRS
-spi_gdf = spi_gdf.to_crs("EPSG:4326")
-lst_gdf = lst_gdf.to_crs("EPSG:4326")
-
-# Perform spatial join to combine SPI and LST data
-combined_gdf = gpd.sjoin(spi_gdf, lst_gdf, how="inner", predicate="intersects")
-
-# Add a combined metric for analysis (e.g., drought severity and LST interaction)
-combined_gdf["combined_metric"] = combined_gdf["drought_severity"] * combined_gdf["LST_value"]
-
-# Sidebar for user selection
-st.sidebar.title("Drought and Surface Temperature Map Viewer")
-metric = st.sidebar.selectbox(
-    "Select metric to display:",
-    ["Drought Severity", "LST", "Combined Metric"],
-)
-
-# Filter combined_gdf based on the selected metric
-if metric == "Drought Severity":
-    combined_gdf["display_metric"] = combined_gdf["drought_severity"]
-    legend_title = "Drought Severity"
-elif metric == "LST":
-    combined_gdf["display_metric"] = combined_gdf["LST_value"]
-    legend_title = "LST Value"
-else:
-    combined_gdf["display_metric"] = combined_gdf["combined_metric"]
-    legend_title = "Combined Metric"
-
-# Compute centroid for map centering
-centroid = combined_gdf.geometry.centroid
-avg_lat = centroid.y.mean()
-avg_lon = centroid.x.mean()
-
-# Initialize the map
-m = folium.Map(location=[avg_lat, avg_lon], zoom_start=8)
-
-# Normalize values for color mapping
-min_val = combined_gdf["display_metric"].min()
-max_val = combined_gdf["display_metric"].max()
-combined_gdf["norm_metric"] = (
-    (combined_gdf["display_metric"] - min_val) / (max_val - min_val)
-)
-
-# Define color palette
-color_palette = ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"]
-
-# Function to style GeoJSON layer
-def style_function(feature):
-    value = feature["properties"]["norm_metric"]
-    color_idx = int(value * (len(color_palette) - 1))
-    color_idx = max(0, min(color_idx, len(color_palette) - 1))  # Ensure valid index
-    return {
-        "fillColor": color_palette[color_idx],
-        "color": "black",
-        "weight": 1,
-        "fillOpacity": 0.7,
-    }
-
-# Add GeoJSON layer to the map
+# Add LST layer to the map
 folium.GeoJson(
-    combined_gdf,
-    style_function=style_function,
-    tooltip=folium.GeoJsonTooltip(
-        fields=["drought_severity", "LST_value", "combined_metric"],
-        aliases=["Drought Severity:", "LST:", "Combined Metric:"],
-    ),
+    lst_gdf,
+    name='LST Layer',
+    tooltip=folium.GeoJsonTooltip(fields=lst_gdf.columns, aliases=lst_gdf.columns)
 ).add_to(m)
 
-# Display map in Streamlit
-st_folium(m, width=700, height=500)
+# Add SPI layer to the map
+folium.GeoJson(
+    spi_gdf,
+    name='SPI Layer',
+    tooltip=folium.GeoJsonTooltip(fields=spi_gdf.columns, aliases=spi_gdf.columns)
+).add_to(m)
 
-# Display the filtered attribute table
-st.subheader("Filtered Attribute Table")
-st.dataframe(combined_gdf[["drought_severity", "LST_value", "combined_metric"]])
+# Add layer control to switch between layers
+folium.LayerControl().add_to(m)
+
+# Save the map to an HTML file
+m.save('/path/to/interactive_map.html')
 
 
 
